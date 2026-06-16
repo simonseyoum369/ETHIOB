@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
+  <title>ETHIOB Diabetes · Complete Demo</title>
+  <!-- Font & Icons (Inter & Lucide via CDN) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      background: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    /* mobile container */
+    .phone {
+      max-width: 420px;
+      width: 100%;
+      background: #f8fafc;
+      border-radius: 40px 40px 28px 28px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    /* fake notch / header */
+    .status-bar {
+      background: white;
+      padding: 14px 20px 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+      border-bottom: 1px solid #e9edf2;
+    }
+    .status-bar span:last-child {
+      color: #0891b2;
+    }
+
+    /* main content area */
+    .screen {
+      padding: 16px 20px 24px;
+      background: #f8fafc;
+      transition: all 0.2s;
+    }
+
+    /* cards, pills, inputs */
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 18px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+      transition: 0.15s;
+    }
+    .card-soft {
+      background: #f1f5f9;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-red {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .badge-green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .glucose-input {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 16px;
+      width: 100%;
+      transition: 0.15s;
+    }
+    .glucose-input:focus {
+      border-color: #0891b2;
+      outline: none;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(8,145,178,0.08);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 40px;
+      font-weight: 600;
+      padding: 12px 20px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .btn-primary {
+      background: #0891b2;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #0d9488;
+      transform: scale(0.98);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #0891b2;
+      color: #0891b2;
+    }
+    .btn-outline:hover {
+      background: #f0fdfa;
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .toggle {
+      width: 48px;
+      height: 28px;
+      background: #cbd5e1;
+      border-radius: 40px;
+      position: relative;
+      cursor: pointer;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle.active {
+      background: #0891b2;
+    }
+    .toggle .dot {
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 40px;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .toggle.active .dot {
+      left: 23px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 40px;
+      display: inline-block;
+    }
+    .dot-green { background: #10b981; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-red { background: #ef4444; }
+    .dot-gray { background: #94a3b8; }
+
+    .meal-icon { font-size: 24px; }
+    .pill-day {
+      background: white;
+      border-radius: 40px;
+      padding: 8px 12px;
+      text-align: center;
+      min-width: 44px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .pill-day.active {
+      border-color: #0891b2;
+      background: #f0fdfa;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 2px solid #e9edf2;
+      margin: 16px 0;
+    }
+
+    /* progress dots */
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 0 12px;
+    }
+    .dot-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 40px;
+      background: #d1d5db;
+      transition: 0.2s;
+    }
+    .dot-indicator.active {
+      background: #0891b2;
+      width: 28px;
+    }
+
+    .lang-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .lang-card.selected {
+      border-color: #0891b2;
+      background: #f0fdfa;
+    }
+
+    /* emergency card special */
+    .emergency-banner {
+      background: #dc2626;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      border-radius: 20px 20px 0 0;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    /* responsive tiny */
+    @media (max-width: 420px) {
+      .phone { border-radius: 28px; }
+      .screen { padding: 12px 14px; }
+    }
+
+    /* utils */
+    .mt-2 { margin-top: 12px; }
+    .mt-4 { margin-top: 20px; }
+    .mb-2 { margin-bottom: 12px; }
+    .gap-2 { gap: 8px; }
+    .text-muted { color: #64748b; font-size: 14px; }
+    .text-small { font-size: 13px; }
+    .font-bold { font-weight: 700; }
+    .text-center { text-align: center; }
+  </style>
+</head>
+<body>
+
+<div class="phone" id="app">
+  <!-- status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>📶 📶 🔋</span>
+  </div>
+
+  <!-- ============== DYNAMIC SCREEN ============== -->
+  <div id="screenContainer" class="screen">
+    <!-- content rendered by js -->
+  </div>
+
+  <!-- bottom nav (simple) -->
+  <div style="background: white; border-top: 1px solid #e9edf2; padding: 12px 20px; display: flex; justify-content: space-around; font-size: 11px; color: #64748b;">
+    <span style="display:flex; flex-direction:column; align-items:center; gap:2px; color:#0891b2; font-weight:600;">🏠 Home</span>
+    <span style="display:flex; flex-direction:column; align-items:center; gap:2px;">📊 Logs</span>
+    <span style="display:flex; flex-direction:column; align-items:center; gap:2px;">💊 Meds</span>
+    <span style="display:flex; flex-direction:column; align-items:center; gap:2px;">👤 Profile</span>
+  </div>
+</div>
+
+<script>
+  // ------------------------------------------------
+  //  STATE & DATA
+  // ------------------------------------------------
+  let state = {
+    screen: 'onboarding',        // onboarding | login | profile | emergency | dashboard | tracking | hba1c | medications | reports
+    lang: 'en',                 // en / am
+    user: {
+      name: 'Alemu Tadesse',
+      email: 'alemu@example.com',
+      phone: '+251-911-234567',
+      diabetesType: 'Type 2',
+      diagnosisDate: '2018-01-15',
+      bloodGroup: 'O+',
+      hospital: 'Black Lion Hospital',
+      specialist: 'Dr. Kebede Bekele',
+      specialistPhone: '+251-111-234567',
+      emergencyName: 'Selam Tesfaye',
+      emergencyPhone: '+251-911-234567',
+      emergencyAddress: 'Addis Ababa, Ethiopia',
+      relation: 'Wife'
+    },
+    readings: [
+      { date: '2026-06-15', meal: 'breakfast', time: 'before', value: 145 },
+      { date: '2026-06-15', meal: 'breakfast', time: 'after', value: 168 },
+      { date: '2026-06-15', meal: 'lunch', time: 'before', value: 158 },
+      { date: '2026-06-15', meal: 'lunch', time: 'after', value: 172 },
+      { date: '2026-06-14', meal: 'breakfast', time: 'before', value: 132 },
+      { date: '2026-06-14', meal: 'breakfast', time: 'after', value: 145 },
+      { date: '2026-06-14', meal: 'lunch', time: 'before', value: 128 },
+      { date: '2026-06-14', meal: 'lunch', time: 'after', value: 152 },
+      { date: '2026-06-13', meal: 'breakfast', time: 'before', value: 118 },
+      { date: '2026-06-13', meal: 'breakfast', time: 'after', value: 135 },
+    ],
+    medications: [
+      { id:1, name:'Levemir', type:'Long-Acting Insulin', morning:12, afternoon:null, night:10, unit:'units', active:true, reminder:true },
+      { id:2, name:'Novorapid', type:'Short-Acting Insulin', morning:4, afternoon:6, night:8, unit:'units', active:true, reminder:true },
+      { id:3, name:'Metformin', type:'Oral Medication', morning:500, afternoon:null, night:500, unit:'mg', active:true, reminder:false },
+      { id:4, name:'Lisinopril', type:'Blood Pressure', morning:10, afternoon:null, night:null, unit:'mg', active:true, reminder:false },
+    ],
+    // temporary/fasting flag
+    fastingMode: false,
+    // current date for tracking
+    today: '2026-06-15'
+  };
+
+  // helpers
+  function getReadingsForDate(date) {
+    return state.readings.filter(r => r.date === date);
+  }
+
+  function getDailyAverage(date) {
+    const dayReadings = getReadingsForDate(date);
+    if (dayReadings.length === 0) return null;
+    const sum = dayReadings.reduce((a,b) => a + b.value, 0);
+    return Math.round(sum / dayReadings.length);
+  }
+
+  function getStatusColor(value, type) {
+    if (!value) return '#94a3b8';
+    if (type === 'before') {
+      if (value < 70) return '#ef4444';
+      if (value <= 130) return '#10b981';
+      if (value <= 180) return '#f59e0b';
+      return '#ef4444';
+    } else {
+      if (value < 140) return '#10b981';
+      if (value <= 180) return '#f59e0b';
+      return '#ef4444';
+    }
+  }
+
+  function getReading(meal, time, date) {
+    const found = state.readings.find(r => r.date === date && r.meal === meal && r.time === time);
+    return found ? found.value : null;
+  }
+
+  // ------------------------------------------------
+  //  RENDER ENGINE
+  // ------------------------------------------------
+  function render() {
+    const container = document.getElementById('screenContainer');
+    let html = '';
+
+    switch (state.screen) {
+      case 'onboarding': html = renderOnboarding(); break;
+      case 'login': html = renderLogin(); break;
+      case 'profile': html = renderProfile(); break;
+      case 'emergency': html = renderEmergency(); break;
+      case 'dashboard': html = renderDashboard(); break;
+      case 'tracking': html = renderTracking(); break;
+      case 'hba1c': html = renderHbA1c(); break;
+      case 'medications': html = renderMedications(); break;
+      case 'reports': html = renderReports(); break;
+      default: html = '<div class="card text-center">Screen not found</div>';
+    }
+
+    container.innerHTML = html;
+
+    // re-init lucide icons
+    lucide.createIcons();
+  }
+
+  // ------------------------------------------------
+  //  SCREEN RENDERERS
+  // ------------------------------------------------
+  function renderOnboarding() {
+    return `
+      <div style="text-align:center; padding:8px 0 12px;">
+        <div style="font-size:52px; margin-bottom:4px;">🏥</div>
+        <div style="font-size:28px; font-weight:800; background:linear-gradient(135deg,#0891b2,#0d9488); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">ETHIOB Diabetes</div>
+        <div style="color:#475569; font-weight:500;">Management Log Book</div>
+      </div>
+      <div class="dots">
+        <span class="dot-indicator active"></span>
+        <span class="dot-indicator"></span>
+        <span class="dot-indicator"></span>
+        <span class="dot-indicator"></span>
+      </div>
+      <div style="font-weight:700; font-size:20px; margin-bottom:4px;">🌍 Choose Your Language</div>
+      <div style="color:#64748b; margin-bottom:16px;">የሚመርጡትን ቋንቋ ይምረጡ</div>
+
+      <div class="lang-card selected" onclick="selectLang('en')">
+        <span style="font-size:32px;">🇬🇧</span>
+        <div><div style="font-weight:700;">English</div><div style="color:#64748b;">English</div></div>
+        <span style="margin-left:auto; color:#0891b2;">✓</span>
+      </div>
+      <div class="lang-card mt-2" onclick="selectLang('am')">
+        <span style="font-size:32px;">🇪🇹</span>
+        <div><div style="font-weight:700;">Amharic</div><div style="color:#64748b; font-size:18px;">አማርኛ</div></div>
+        <span style="margin-left:auto; color:#0891b2; opacity:0.3;">✓</span>
+      </div>
+
+      <button class="btn btn-primary mt-4" onclick="goTo('login')">Continue →</button>
+      <div style="font-size:12px; color:#94a3b8; text-align:center; margin-top:12px;">By continuing you agree to Terms & Privacy</div>
+    `;
+  }
+
+  function renderLogin() {
+    return `
+      <div style="font-weight:700; font-size:22px;">👋 Welcome Back</div>
+      <div style="color:#64748b; margin-bottom:16px;">Sign in to access your diabetes data</div>
+
+      <div class="flex-row" style="margin-bottom:16px;">
+        <div style="flex:1; background:#0891b2; color:white; padding:10px; border-radius:40px; text-align:center; font-weight:600;">Sign In</div>
+        <div style="flex:1; background:#f1f5f9; color:#64748b; padding:10px; border-radius:40px; text-align:center; font-weight:600; cursor:pointer;" onclick="alert('Switch to signup')">Create Account</div>
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight:600; font-size:14px; color:#475569;">📧 Email or Phone</label>
+        <input class="glucose-input" type="text" placeholder="Enter email or phone" value="alemu@example.com" />
+      </div>
+      <div class="form-group mt-2">
+        <label style="font-weight:600; font-size:14px; color:#475569;">🔒 Password</label>
+        <input class="glucose-input" type="password" placeholder="Enter password" value="••••••••" />
+      </div>
+
+      <button class="btn btn-primary mt-4" onclick="goTo('dashboard')">🔑 Sign In</button>
+      <div style="text-align:right; margin-top:6px; color:#0891b2; font-weight:600; font-size:14px; cursor:pointer;" onclick="alert('Password reset sent')">Forgot password?</div>
+    `;
+  }
+
+  function renderProfile() {
+    const u = state.user;
+    return `
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <div style="width:72px; height:72px; background:linear-gradient(135deg,#0891b2,#0d9488); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:36px; box-shadow:0 4px 12px rgba(8,145,178,0.3);">👤</div>
+        <div>
+          <div style="font-weight:800; font-size:22px;">${u.name}</div>
+          <div style="color:#475569;">${u.email}</div>
+          <div style="background:#f0fdfa; color:#0891b2; padding:2px 12px; border-radius:40px; font-size:12px; font-weight:600; display:inline-block; margin-top:2px;">🩸 ${u.diabetesType} • Since 2018</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex-between"><span style="font-weight:700;">🏥 Medical Information</span><span style="color:#0891b2; font-weight:600; cursor:pointer;" onclick="alert('Edit medical info')">✏️ Edit</span></div>
+        <div class="flex-between" style="padding:8px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">🩸 Diabetes Type</span><span style="font-weight:600;">${u.diabetesType}</span></div>
+        <div class="flex-between" style="padding:8px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">📅 Diagnosis Date</span><span style="font-weight:600;">${u.diagnosisDate}</span></div>
+        <div class="flex-between" style="padding:8px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">🩸 Blood Group</span><span style="font-weight:600;">${u.bloodGroup}</span></div>
+        <div class="flex-between" style="padding:8px 0;"><span style="color:#64748b;">🏥 Hospital</span><span style="font-weight:600;">${u.hospital}</span></div>
+      </div>
+
+      <div class="card">
+        <div class="flex-between"><span style="font-weight:700;">📞 Emergency Contact</span><span style="color:#0891b2; font-weight:600; cursor:pointer;" onclick="alert('Edit emergency contact')">✏️ Edit</span></div>
+        <div class="flex-between" style="padding:8px 0;"><span style="color:#64748b;">👤 ${u.emergencyName}</span><span style="font-weight:600;">${u.emergencyPhone}</span></div>
+        <div style="color:#64748b; font-size:14px;">${u.relation} • ${u.emergencyAddress}</div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700;">⚙️ Settings</div>
+        <div class="flex-between" style="padding:8px 0;"><span>🌐 Language</span><span style="color:#0891b2; font-weight:500;">English ›</span></div>
+        <div class="flex-between" style="padding:8px 0;"><span>🔔 Notifications</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="dot"></div></div></div>
+        <div class="flex-between" style="padding:8px 0;"><span>☁️ Cloud Sync</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="dot"></div></div></div>
+      </div>
+
+      <button class="btn btn-outline" onclick="goTo('dashboard')">← Back to Dashboard</button>
+    `;
+  }
+
+  function renderEmergency() {
+    const u = state.user;
+    // get latest readings (last 4)
+    const sorted = [...state.readings].sort((a,b) => b.date.localeCompare(a.date) || (a.time === 'after' ? 1 : -1));
+    const latest = sorted.slice(0,4);
+
+    return `
+      <div class="emergency-banner">🚨 EMERGENCY MEDICAL ID · SHOW TO FIRST RESPONDER</div>
+      <div class="card" style="border-radius:0 0 20px 20px; margin-top:0;">
+        <div style="text-align:center;">
+          <div style="font-size:48px;">👤</div>
+          <div style="font-weight:800; font-size:22px;">${u.name}</div>
+          <div style="background:#fee2e2; color:#dc2626; display:inline-block; padding:2px 16px; border-radius:40px; font-weight:600; font-size:13px;">🩸 ${u.diabetesType}</div>
+          <div style="color:#64748b; font-size:13px;">Since ${u.diagnosisDate}</div>
+        </div>
+
+        <div class="grid-2" style="margin:12px 0;">
+          <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">🩸 Blood Type</div><div style="font-weight:700;">${u.bloodGroup}</div></div>
+          <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">🏥 Hospital</div><div style="font-weight:700;">${u.hospital}</div></div>
+          <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">👨‍⚕️ Specialist</div><div style="font-weight:700;">${u.specialist}</div></div>
+          <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">📞 Specialist</div><div style="font-weight:700;">${u.specialistPhone}</div></div>
+        </div>
+
+        <div style="background:#f1f5f9; border-radius:12px; padding:12px; margin:12px 0;">
+          <div style="font-weight:700; font-size:13px;">📞 EMERGENCY CONTACT</div>
+          <div class="flex-between"><span>${u.emergencyName} (${u.relation})</span><span style="font-weight:600;">${u.emergencyPhone}</span></div>
+        </div>
+
+        <div style="background:#fef3c7; border-left:4px solid #f59e0b; padding:12px; border-radius:8px; margin:12px 0;">
+          <div style="font-size:13px; color:#92400e;"><strong>⚠️ LATEST READINGS (24h)</strong></div>
+          ${latest.map(r => `
+            <div class="flex-between" style="font-size:13px; padding:4px 0; border-bottom:1px solid #fde68a;">
+              <span>${r.date} ${r.meal} ${r.time}</span>
+              <span style="font-weight:700; color:${getStatusColor(r.value, r.time)};">${r.value} mg/dL</span>
+            </div>
+          `).join('')}
+          ${latest.length === 0 ? '<div style="color:#92400e;">No recent readings</div>' : ''}
+        </div>
+
+        <div class="flex-row" style="gap:8px; margin-top:8px;">
+          <button class="btn btn-danger" style="flex:1;" onclick="alert('📞 Calling emergency contact: ' + '${u.emergencyPhone}')">📞 Call</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="alert('✅ Emergency card shared')">📤 Share</button>
+        </div>
+        <div style="text-align:center; margin-top:10px; color:#94a3b8; font-size:11px;">Scan QR for full medical record</div>
+      </div>
+    `;
+  }
+
+  function renderDashboard() {
+    const avg = getDailyAverage(state.today);
+    const readingsToday = getReadingsForDate(state.today);
+    const count = readingsToday.length;
+
+    return `
+      <div class="flex-between">
+        <div><div style="color:#64748b;">👋 Good morning,</div><div style="font-weight:800; font-size:22px;">${state.user.name}</div></div>
+        <div style="font-size:20px; cursor:pointer;" onclick="goTo('emergency')">🚨</div>
+      </div>
+      <div style="color:#0891b2; font-weight:500; margin-bottom:16px;">${state.today} · Wednesday</div>
+
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="card" style="padding:12px; text-align:center;"><div style="font-size:28px; font-weight:800;">${avg || '—'}</div><div style="color:#64748b; font-size:12px;">Avg Glucose</div></div>
+        <div class="card" style="padding:12px; text-align:center;"><div style="font-size:28px; font-weight:800;">7.2%</div><div style="color:#64748b; font-size:12px;">Est. HbA1c</div></div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700;">📊 Today's Readings</div>
+        ${['breakfast','lunch','dinner'].map(meal => {
+          const before = getReading(meal, 'before', state.today);
+          const after = getReading(meal, 'after', state.today);
+          return `
+            <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:14px;">
+              <span>${meal === 'breakfast' ? '🍳' : meal === 'lunch' ? '🥗' : '🍽️'} ${meal}</span>
+              <span><span style="color:${getStatusColor(before,'before')};">${before || '—'}</span> → <span style="color:${getStatusColor(after,'after')};">${after || '—'}</span></span>
+            </div>
+          `
+        }).join('')}
+        <div style="margin-top:8px; font-weight:600; color:#0891b2;">${count}/6 readings logged</div>
+      </div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-primary" style="flex:1;" onclick="goTo('tracking')">📝 Log Glucose</button>
+        <button class="btn btn-outline" style="flex:1;" onclick="goTo('hba1c')">📈 HbA1c</button>
+        <button class="btn btn-outline" style="flex:1;" onclick="goTo('medications')">💊 Meds</button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn btn-outline" style="flex:1;" onclick="goTo('profile')">👤 Profile</button>
+        <button class="btn btn-outline" style="flex:1;" onclick="goTo('reports')">📄 Reports</button>
+      </div>
+
+      <div style="margin-top:12px; background:#fef3c7; border-radius:12px; padding:12px; font-size:13px; color:#92400e;">
+        ⚠️ <strong>Fasting Mode:</strong> ${state.fastingMode ? 'Active (የጾም ጊዜ) — adjust insulin' : 'Inactive'}
+        <span style="display:inline-block; margin-left:8px; cursor:pointer; font-weight:600; color:#0891b2;" onclick="state.fastingMode=!state.fastingMode; render();">Toggle</span>
+      </div>
+    `;
+  }
+
+  function renderTracking() {
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const dates = ['10','11','12','13','14','15','16'];
+    const todayIdx = 5; // Sat
+
+    return `
+      <div class="flex-between"><span style="font-weight:700; font-size:18px;">📅 Weekly Log</span><span style="color:#0891b2;">June 10-16, 2026</span></div>
+      <div class="flex-row" style="margin:12px 0; gap:4px;">
+        ${days.map((d,i) => `
+          <div class="pill-day ${i===todayIdx?'active':''}" onclick="alert('View ${d}')">
+            <div style="font-weight:600; font-size:12px;">${d}</div>
+            <div style="font-size:10px; color:#94a3b8;">${dates[i]}</div>
+            <div class="status-dot ${i===todayIdx?'dot-yellow':'dot-green'}" style="margin-top:4px;"></div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="font-weight:700; font-size:16px;">📅 ${state.today} · Wednesday</div>
+
+      ${['breakfast','lunch','dinner'].map(meal => {
+        const before = getReading(meal, 'before', state.today);
+        const after = getReading(meal, 'after', state.today);
+        const icon = meal === 'breakfast' ? '🍳' : meal === 'lunch' ? '🥗' : '🍽️';
+        return `
+          <div class="card" style="margin-top:12px;">
+            <div style="font-weight:700; font-size:16px; margin-bottom:8px;">${icon} ${meal.toUpperCase()}</div>
+            <div class="flex-row">
+              <div style="flex:1; background:#f8fafc; padding:8px 12px; border-radius:12px;">
+                <div style="font-size:11px; color:#64748b;">Before</div>
+                <div style="font-weight:700; font-size:20px; color:${getStatusColor(before,'before')};">${before || '—'} <span style="font-size:12px; font-weight:400; color:#94a3b8;">mg/dL</span></div>
+              </div>
+              <div style="flex:1; background:#f8fafc; padding:8px 12px; border-radius:12px;">
+                <div style="font-size:11px; color:#64748b;">2h After</div>
+                <div style="font-weight:700; font-size:20px; color:${getStatusColor(after,'after')};">${after || '—'} <span style="font-size:12px; font-weight:400; color:#94a3b8;">mg/dL</span></div>
+              </div>
+            </div>
+          </div>
+        `
+      }).join('')}
+
+      <div class="card" style="background:linear-gradient(135deg,#0891b2,#0d9488); color:white;">
+        <div style="font-size:13px; opacity:0.9;">Daily Average Result (DAR)</div>
+        <div style="font-size:32px; font-weight:800;">${getDailyAverage(state.today) || '—'} mg/dL</div>
+        <div style="font-size:13px; opacity:0.8;">${getDailyAverage(state.today) ? (getDailyAverage(state.today) <=130 ? '✨ Excellent Control' : '👍 Good Control') : 'Log more readings'}</div>
+      </div>
+
+      <button class="btn btn-outline mt-2" onclick="goTo('dashboard')">← Back to Dashboard</button>
+    `;
+  }
+
+  function renderHbA1c() {
+    return `
+      <div style="font-weight:700; font-size:22px;">📊 HbA1c Estimator</div>
+      <div style="color:#64748b; margin-bottom:12px;">Based on 12-week average · ${state.today}</div>
+
+      <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white;">
+        <div style="font-size:14px; opacity:0.9;">Estimated HbA1c</div>
+        <div style="font-size:56px; font-weight:800;">7.2%</div>
+        <div style="font-size:14px; opacity:0.8;">55 mmol/mol</div>
+        <div style="background:rgba(255,255,255,0.2); display:inline-block; padding:4px 14px; border-radius:40px; font-size:12px; font-weight:600;">⚠️ Above Target (<7.0%)</div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700;">📈 12-Week Trend</div>
+        <div style="display:flex; gap:4px; height:70px; align-items:flex-end; margin:12px 0;">
+          ${[40,45,50,35,42,52,55,44,48,58,53,60].map(h => `
+            <div style="flex:1; background:${h>55?'#ef4444':h>48?'#f59e0b':'#10b981'}; height:${h}px; border-radius:4px;"></div>
+          `).join('')}
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:9px; color:#94a3b8;">W1 W2 W3 W4 W5 W6 W7 W8 W9 W10 W11 W12</div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700; margin-bottom:8px;">📋 Reference Range (ADA)</div>
+        <div style="font-size:13px;">
+          <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span><span class="status-dot dot-green"></span> Normal</span><span>< 5.7%</span><span>< 117 mg/dL</span></div>
+          <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span><span class="status-dot dot-yellow"></span> Pre-diabetes</span><span>5.7–6.4%</span><span>117–137</span></div>
+          <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span><span class="status-dot" style="background:#f59e0b;"></span> Diabetes (Managed)</span><span>6.5–7.9%</span><span>140–180</span></div>
+          <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span><span class="status-dot dot-red"></span> High Risk</span><span>8.0–9.9%</span><span>183–240</span></div>
+          <div class="flex-between" style="padding:6px 0;"><span><span class="status-dot" style="background:#991b1b;"></span> Dangerous</span><span>≥10.0%</span><span>≥240</span></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="alert('📄 Full report generated (PDF)')">📄 Generate Full Report</button>
+      <button class="btn btn-outline mt-2" onclick="goTo('dashboard')">← Back</button>
+    `;
+  }
+
+  function renderMedications() {
+    const meds = state.medications;
+    return `
+      <div class="flex-between"><span style="font-weight:700; font-size:22px;">💊 Medications</span><span style="font-size:28px; font-weight:300; color:#0891b2; cursor:pointer;" onclick="alert('Add new medication')">+</span></div>
+
+      <div class="flex-row" style="margin:12px 0;">
+        <div class="card" style="flex:1; text-align:center; padding:8px;"><span style="font-weight:800;">${meds.length}</span><br><span style="font-size:11px; color:#64748b;">Active</span></div>
+        <div class="card" style="flex:1; text-align:center; padding:8px;"><span style="font-weight:800;">${meds.filter(m=>m.reminder).length}</span><br><span style="font-size:11px; color:#64748b;">Reminders</span></div>
+      </div>
+
+      ${meds.map(m => `
+        <div class="card" style="border-left:4px solid ${m.type.includes('Insulin')?'#0891b2':'#8b5cf6'};">
+          <div class="flex-between">
+            <span style="font-weight:700;">${m.name}</span>
+            <span style="font-size:12px; color:#64748b;">${m.type}</span>
+          </div>
+          <div class="grid-2" style="margin:8px 0; font-size:14px;">
+            <div><span style="color:#64748b;">Morning</span> ${m.morning||'—'} ${m.unit}</div>
+            <div><span style="color:#64748b;">Afternoon</span> ${m.afternoon||'—'} ${m.unit}</div>
+            <div><span style="color:#64748b;">Night</span> ${m.night||'—'} ${m.unit}</div>
+            <div><span style="color:#64748b;">Total</span> ${(m.morning||0)+(m.afternoon||0)+(m.night||0)} ${m.unit}</div>
+          </div>
+          <div class="flex-between">
+            <span style="font-size:13px; color:#64748b;">🔔 Reminder</span>
+            <div class="toggle ${m.reminder?'active':''}" onclick="this.classList.toggle('active')"><div class="dot"></div></div>
+          </div>
+        </div>
+      `).join('')}
+
+      <div class="card" style="background:#fef3c7; border:2px solid #f59e0b;">
+        <div style="font-weight:700;">🕊️ Fasting Season Mode</div>
+        <div style="font-size:13px; color:#92400e;">${state.fastingMode ? '✅ Active: Adjust medications for የጾም ጊዜ' : '⏸️ Inactive'}</div>
+        <button class="btn btn-outline mt-2" style="background:white;" onclick="state.fastingMode=!state.fastingMode; render();">${state.fastingMode ? 'Disable' : 'Enable'} Fasting Mode</button>
+      </div>
+
+      <button class="btn btn-outline mt-2" onclick="goTo('dashboard')">← Back</button>
+    `;
+  }
+
+  function renderReports() {
+    return `
+      <div class="flex-between"><span style="font-weight:700; font-size:22px;">📄 Reports</span><span style="background:#f0fdfa; color:#0891b2; padding:4px 12px; border-radius:40px; font-size:12px; font-weight:600;">12 weeks</span></div>
+
+      <div class="card" style="background:linear-gradient(135deg,#0891b2,#0d9488); color:white;">
+        <div style="font-weight:700;">✨ Generate New Report</div>
+        <div style="font-size:13px; opacity:0.9;">Create comprehensive report for your doctor</div>
+        <div class="flex-row" style="margin-top:12px;">
+          <div style="flex:1; background:rgba(255,255,255,0.15); padding:10px; border-radius:12px; text-align:center; cursor:pointer;" onclick="alert('Quick summary generated')">📊 Quick</div>
+          <div style="flex:1; background:rgba(255,255,255,0.15); padding:10px; border-radius:12px; text-align:center; cursor:pointer;" onclick="alert('Full report generated')">📋 Full</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex-between"><span style="font-weight:700;">📊 Monthly Summary</span><span style="color:#94a3b8; font-size:12px;">June 2026</span></div>
+        <div style="display:flex; gap:4px; height:40px; align-items:flex-end; margin:8px 0;">
+          ${[30,35,40,28,32,38,25].map(h => `<div style="flex:1; background:#10b981; height:${h}px; border-radius:4px;"></div>`).join('')}
+        </div>
+        <div class="flex-row" style="gap:4px;">
+          <button class="btn btn-primary" style="flex:1; padding:8px;" onclick="alert('View report')">👁️ View</button>
+          <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="alert('PDF downloaded')">📥 PDF</button>
+          <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="alert('Shared via email')">📤 Share</button>
+        </div>
+      </div>
+
+      <div class="card" style="border:2px solid #fee2e2;">
+        <div style="color:#dc2626; font-weight:700;">🚨 Emergency Medical ID</div>
+        <div style="font-size:14px; color:#475569;">${state.user.name} · ${state.user.diabetesType}</div>
+        <div style="font-size:13px; color:#64748b;">📞 ${state.user.emergencyPhone}</div>
+        <button class="btn btn-danger mt-2" onclick="goTo('emergency')">🆘 View Card</button>
+      </div>
+
+      <button class="btn btn-outline mt-2" onclick="goTo('dashboard')">← Back</button>
+    `;
+  }
+
+  // ------------------------------------------------
+  //  NAVIGATION & HELPERS
+  // ------------------------------------------------
+  window.goTo = function(screen) {
+    state.screen = screen;
+    render();
+  };
+
+  window.selectLang = function(lang) {
+    state.lang = lang;
+    document.querySelectorAll('.lang-card').forEach(el => el.classList.remove('selected'));
+    // just visual for demo
+    alert(`Language set to ${lang === 'en' ? 'English' : 'Amharic (አማርኛ)'}`);
+    // go to login
+    goTo('login');
+  };
+
+  // ------------------------------------------------
+  //  INIT
+  // ------------------------------------------------
+  render();
+</script>
+
+</body>
+</html>
