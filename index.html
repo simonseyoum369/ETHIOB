@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ETHIOB Diabetes · Full Demo</title>
+    <title>ETHIOB Diabetes · Full Demo + Daily Quotes</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet" />
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -33,7 +33,7 @@
         }
         .app-header {
             background: white;
-            padding: 16px 20px 10px;
+            padding: 14px 20px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -59,6 +59,7 @@
             gap: 6px;
             color: #0f172a;
             transition: 0.15s;
+            font-family: inherit;
         }
         .app-header .lang-toggle:hover {
             background: #e2e8f0;
@@ -69,34 +70,35 @@
         }
         .screen {
             padding: 16px 20px 20px;
-            min-height: 520px;
+            min-height: 480px;
             background: #f8fafc;
         }
         /* nav tabs */
         .nav-tabs {
             display: flex;
-            gap: 4px;
+            gap: 2px;
             background: white;
-            padding: 8px 12px;
+            padding: 6px 8px;
             border-top: 1px solid #e9edf2;
             justify-content: space-around;
         }
         .nav-tab {
             background: none;
             border: none;
-            padding: 8px 8px;
+            padding: 6px 4px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #94a3b8;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 1px;
             transition: 0.15s;
             flex: 1;
-            max-width: 70px;
+            max-width: 64px;
+            font-family: inherit;
         }
         .nav-tab:hover {
             background: #f1f5f9;
@@ -111,7 +113,7 @@
             line-height: 1;
         }
         .nav-tab .label {
-            font-size: 10px;
+            font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
@@ -416,21 +418,19 @@
         .reading-row:last-child {
             border-bottom: none;
         }
-        /* amharic font */
         .amharic {
             font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif;
         }
-        /* responsive */
         @media (max-width: 480px) {
             .app {
                 border-radius: 20px;
             }
             .screen {
                 padding: 12px 14px;
-                min-height: 440px;
+                min-height: 400px;
             }
             .nav-tab .label {
-                font-size: 9px;
+                font-size: 8px;
             }
         }
         .hidden {
@@ -449,7 +449,7 @@
                 transform: translateY(0);
             }
         }
-        /* toast */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 100px;
@@ -461,7 +461,7 @@
             border-radius: 40px;
             font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             z-index: 999;
             pointer-events: none;
             opacity: 0;
@@ -472,12 +472,130 @@
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
+        /* Modal overlay for daily quote */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s ease;
+            padding: 20px;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-overlay.show .modal-box {
+            transform: scale(1) translateY(0);
+        }
+        .modal-box {
+            background: white;
+            border-radius: 32px;
+            max-width: 400px;
+            width: 100%;
+            padding: 32px 28px 28px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.92) translateY(20px);
+            transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #0891b2, #0d9488, #10b981);
+        }
+        .modal-box .quote-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .modal-box .quote-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+        .modal-box .quote-text.amharic {
+            font-size: 20px;
+            font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif;
+        }
+        .modal-box .quote-author {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        .modal-box .quote-date {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 18px;
+        }
+        .modal-box .btn {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        /* quote badge on dashboard */
+        .quote-badge {
+            background: linear-gradient(135deg, #f0fdfa, #e0f2fe);
+            border-radius: 40px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid #bae6fd;
+            margin-bottom: 12px;
+        }
+        .quote-badge:hover {
+            transform: scale(1.01);
+            border-color: #0891b2;
+        }
+        .quote-badge .icon {
+            font-size: 28px;
+        }
+        .quote-badge .preview {
+            font-size: 13px;
+            color: #0f172a;
+            font-weight: 500;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .quote-badge .preview.amharic {
+            font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif;
+            font-size: 15px;
+        }
+        .quote-badge .lang-tag {
+            font-size: 10px;
+            background: #0891b2;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
 
 <div class="app" id="app">
-    <!-- Header with logo and lang toggle -->
+    <!-- Header -->
     <div class="app-header">
         <span class="logo">🏥 ETHIOB</span>
         <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">
@@ -516,6 +634,18 @@
 
     <!-- Toast -->
     <div class="toast" id="toast"></div>
+
+    <!-- Daily Quote Modal -->
+    <div class="modal-overlay" id="quoteModal">
+        <div class="modal-box">
+            <div class="quote-icon" id="quoteIcon">💪</div>
+            <div class="quote-text" id="quoteText">"Your health is your greatest wealth."</div>
+            <div class="quote-author" id="quoteAuthor">— Unknown</div>
+            <div class="quote-date" id="quoteDate">📅 June 16, 2026</div>
+            <button class="btn btn-primary" onclick="closeQuote()">🙏 Thank You</button>
+            <div style="margin-top:10px; font-size:12px; color:#94a3b8;">Daily Dose of Inspiration</div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -523,8 +653,9 @@
     //  STATE
     // =====================================================
     const state = {
-        lang: 'en', // 'en' or 'am'
+        lang: 'en',
         screen: 'dashboard',
+        isLoggedIn: false,
         user: {
             name: 'Alemu Tadesse',
             email: 'alemu@example.com',
@@ -539,8 +670,8 @@
             emergencyPhone: '+251-911-234567',
             emergencyAddress: 'Addis Ababa, Ethiopia',
             relation: 'Wife',
-            testingMethod: 'glucose_meter', // glucose_meter, cgm, lab
-            testingFrequency: 'frequent', // frequent, moderate, basic
+            testingMethod: 'glucose_meter',
+            testingFrequency: 'frequent',
             fastingMode: false,
         },
         readings: [
@@ -565,18 +696,79 @@
             { id: 4, name: 'Lisinopril', type: 'Blood Pressure', morning: 10, afternoon: null, night: null, unit: 'mg',
                 active: true, reminder: false },
         ],
-        // temporary medications
-        tempMeds: [],
-        today: '2026-06-15',
-        // auth state
-        isLoggedIn: false,
-        showSignup: false,
-        // onboarding step
-        onboardingStep: 0,
+        today: '2026-06-16',
+        // Daily quote state
+        quoteShownToday: false,
+        currentQuote: null,
     };
 
     // =====================================================
-    //  TRANSLATIONS (EN / AM)
+    //  QUOTES DATABASE (Bilingual)
+    // =====================================================
+    const quotesDB = [{
+        id: 1,
+        en: { text: "Your health is your greatest wealth.", author: "Unknown" },
+        am: { text: "ጤና ታላቅ ሀብት ነው።", author: "ያልታወቀ" },
+        icon: "💪"
+    }, {
+        id: 2,
+        en: { text: "Every step counts. Every reading matters.", author: "Diabetes Warrior" },
+        am: { text: "እያንዳንዱ እርምጃ ይቆጠራል። እያንዳንዱ ንባብ ጠቃሚ ነው።", author: "የስኳር ህመም ተዋጊ" },
+        icon: "👣"
+    }, {
+        id: 3,
+        en: { text: "Diabetes doesn't define you. You define how you manage it.", author: "Unknown" },
+        am: { text: "የስኳር ህመም አይገልጽህም። እንዴት እንደምትቆጣጠረው አንተ ትወስናለህ።", author: "ያልታወቀ" },
+        icon: "🌟"
+    }, {
+        id: 4,
+        en: { text: "Small daily improvements lead to long-term success.", author: "James Clear" },
+        am: { text: "ትናንሽ የቀን መሻሻሎች ወደ ረጅም ጊዜ ስኬት ያመራሉ።", author: "ጄምስ ክሊር" },
+        icon: "📈"
+    }, {
+        id: 5,
+        en: { text: "You are stronger than you think. Keep going!", author: "Motivation" },
+        am: { text: "ከምታስበው በላይ ጠንካራ ነህ። ቀጥል!", author: "ማበረታቻ" },
+        icon: "⚡"
+    }, {
+        id: 6,
+        en: { text: "Blood sugar is just a number. You are so much more.", author: "Unknown" },
+        am: { text: "የደም ስኳር ቁጥር ብቻ ነው። አንተ ከዚያ በላይ ነህ።", author: "ያልታወቀ" },
+        icon: "💖"
+    }, {
+        id: 7,
+        en: { text: "Progress, not perfection. Every reading is data, not judgment.", author: "Diabetes Coach" },
+        am: { text: "መሻሻል፣ ፍጹምነት አይደለም። እያንዳንዱ ንባብ መረጃ ነው፣ ፍርድ አይደለም።", author: "የስኳር ህመም አሰልጣኝ" },
+        icon: "📊"
+    }, {
+        id: 8,
+        en: { text: "The best time to start was yesterday. The next best time is now.", author: "Unknown" },
+        am: { text: "ለመጀመር በጣም ጥሩው ጊዜ ትናንት ነበር። ቀጣዩ ጥሩ ጊዜ አሁን ነው።", author: "ያልታወቀ" },
+        icon: "⏰"
+    }, {
+        id: 9,
+        en: { text: "You are not alone. Millions walk this path with you.", author: "Diabetes Community" },
+        am: { text: "ብቻህን አይደለህም። በሚሊዮን የሚቆጠሩ ሰዎች ይህን መንገድ ከአንተ ጋር ይራመዳሉ።", author: "የስኳር ህመም ማህበረሰብ" },
+        icon: "🤝"
+    }, {
+        id: 10,
+        en: { text: "Health is a journey, not a destination. Enjoy the process.", author: "Unknown" },
+        am: { text: "ጤና ጉዞ ነው፣ መድረሻ አይደለም። ሂደቱን ተደሰት።", author: "ያልታወቀ" },
+        icon: "🌿"
+    }, {
+        id: 11,
+        en: { text: "እግዚአብሔር በየቀኑ አዲስ ጥንካሬ ይሰጠናል — God gives us new strength every day.", author: "Ethiopian Proverb" },
+        am: { text: "እግዚአብሔር በየቀኑ አዲስ ጥንካሬ ይሰጠናል።", author: "የኢትዮጵያ ምሳሌ" },
+        icon: "🙏"
+    }, {
+        id: 12,
+        en: { text: "Be patient with yourself. Healing and managing takes time.", author: "Unknown" },
+        am: { text: "በራስህ ላይ በትዕግስት ተያዝ። መፈወስ እና መቆጣጠር ጊዜ ይፈልጋል።", author: "ያልታወቀ" },
+        icon: "🧘"
+    }];
+
+    // =====================================================
+    //  TRANSLATIONS
     // =====================================================
     const t = {
         en: {
@@ -586,20 +778,17 @@
             nav_meds: 'Meds',
             nav_emergency: 'Emergency',
             nav_profile: 'Profile',
-            // onboarding
             choose_lang: 'Choose Your Language',
             choose_lang_sub: 'Select your preferred language',
             english: 'English',
             amharic: 'Amharic',
             continue: 'Continue →',
-            // login
             welcome_back: 'Welcome Back',
             sign_in: 'Sign In',
             create_account: 'Create Account',
             email_phone: 'Email or Phone',
             password: 'Password',
             forgot_password: 'Forgot password?',
-            // signup
             full_name: 'Full Name',
             phone_number: 'Phone Number',
             diabetes_type: 'Diabetes Type',
@@ -619,7 +808,6 @@
             basic: 'Basic (1-2x daily)',
             custom_freq: 'Custom',
             create_btn: '✨ Create Account',
-            // dashboard
             good_morning: 'Good morning',
             avg_glucose: 'Avg Glucose',
             est_hba1c: 'Est. HbA1c',
@@ -634,7 +822,6 @@
             fasting_active: 'Active (የጾም ጊዜ) — adjust insulin',
             fasting_inactive: 'Inactive',
             toggle: 'Toggle',
-            // tracking
             weekly_log: 'Weekly Log',
             daily_average: 'Daily Average Result (DAR)',
             excellent: '✨ Excellent Control',
@@ -645,7 +832,6 @@
             breakfast: 'Breakfast',
             lunch: 'Lunch',
             dinner: 'Dinner',
-            // emergency
             emergency_title: 'EMERGENCY MEDICAL ID · SHOW TO FIRST RESPONDER',
             blood_type: 'Blood Type',
             hospital: 'Hospital',
@@ -654,7 +840,6 @@
             latest_readings: 'LATEST READINGS (24h)',
             call: 'Call',
             share: 'Share',
-            // medications
             medications_title: 'Medications',
             active: 'Active',
             reminders: 'Reminders',
@@ -667,7 +852,6 @@
             fasting_season: 'Fasting Season Mode',
             fasting_enable: 'Enable Fasting Mode',
             fasting_disable: 'Disable Fasting Mode',
-            // profile
             medical_info: 'Medical Information',
             edit: 'Edit',
             emergency_contact_label: 'Emergency Contact',
@@ -675,7 +859,6 @@
             language: 'Language',
             notifications: 'Notifications',
             cloud_sync: 'Cloud Sync',
-            // reports
             reports_title: 'Reports',
             generate_report: 'Generate New Report',
             quick_summary: 'Quick Summary',
@@ -686,13 +869,11 @@
             share_report: 'Share',
             emergency_id_card: 'Emergency Medical ID',
             view_card: 'View Card',
-            // common
             back: '← Back',
             save: 'Save',
             cancel: 'Cancel',
             delete: 'Delete',
             ok: 'OK',
-            // toast messages
             toast_lang_changed: 'Language changed to {lang}',
             toast_reading_saved: '✅ Reading saved!',
             toast_med_added: '✅ Medication added!',
@@ -701,6 +882,9 @@
             toast_emergency_shared: '✅ Emergency card shared',
             toast_emergency_called: '📞 Calling emergency contact...',
             toast_report_generated: '📄 Report generated!',
+            toast_quote_closed: '✨ Stay inspired! See you tomorrow.',
+            daily_quote_title: '💡 Daily Dose of Inspiration',
+            quote_thank_you: '🙏 Thank You',
         },
         am: {
             app_name: 'ETHIOB የስኳር ህመም',
@@ -813,12 +997,12 @@
             toast_emergency_shared: '✅ የድንገተኛ ጊዜ ካርድ ተጋርቷል',
             toast_emergency_called: '📞 ወደ ድንገተኛ ጊዜ እውቂያ እየተደወለ...',
             toast_report_generated: '📄 ሪፖርቱ ተዘጋጅቷል!',
+            toast_quote_closed: '✨ ተመስጠን! ነገ እንገናኝ።',
+            daily_quote_title: '💡 የቀን መንፈሳዊ ቃል',
+            quote_thank_you: '🙏 አመሰግናለሁ',
         }
     };
 
-    // =====================================================
-    //  HELPERS
-    // =====================================================
     function _(key, vars = {}) {
         let text = t[state.lang][key] || key;
         for (const [k, v] of Object.entries(vars)) {
@@ -827,6 +1011,9 @@
         return text;
     }
 
+    // =====================================================
+    //  HELPERS
+    // =====================================================
     function getReadingsForDate(date) {
         return state.readings.filter(r => r.date === date);
     }
@@ -880,6 +1067,54 @@
     }
 
     // =====================================================
+    //  DAILY QUOTE SYSTEM
+    // =====================================================
+    function getDailyQuote() {
+        const today = new Date().toDateString();
+        // Use a deterministic but pseudo-random selection based on date
+        const seed = today.split(' ').join('').length + new Date().getDate() + new Date().getMonth() * 31;
+        const index = seed % quotesDB.length;
+        return quotesDB[index];
+    }
+
+    function showDailyQuote() {
+        const modal = document.getElementById('quoteModal');
+        const quote = getDailyQuote();
+        state.currentQuote = quote;
+
+        const isAm = state.lang === 'am';
+        const textEl = document.getElementById('quoteText');
+        const authorEl = document.getElementById('quoteAuthor');
+        const iconEl = document.getElementById('quoteIcon');
+        const dateEl = document.getElementById('quoteDate');
+
+        iconEl.textContent = quote.icon;
+        if (isAm) {
+            textEl.textContent = `"${quote.am.text}"`;
+            textEl.className = 'quote-text amharic';
+            authorEl.textContent = `— ${quote.am.author}`;
+        } else {
+            textEl.textContent = `"${quote.en.text}"`;
+            textEl.className = 'quote-text';
+            authorEl.textContent = `— ${quote.en.author}`;
+        }
+        dateEl.textContent = `📅 ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+
+        modal.classList.add('show');
+        state.quoteShownToday = true;
+    }
+
+    window.closeQuote = function() {
+        document.getElementById('quoteModal').classList.remove('show');
+        showToast(_('toast_quote_closed'));
+    };
+
+    // Close on backdrop click
+    document.getElementById('quoteModal').addEventListener('click', function(e) {
+        if (e.target === this) closeQuote();
+    });
+
+    // =====================================================
     //  LANGUAGE TOGGLE
     // =====================================================
     window.toggleLanguage = function() {
@@ -896,7 +1131,6 @@
             label.textContent = 'EN';
             btn.classList.remove('active');
         }
-        // re-render
         render();
         showToast(_('toast_lang_changed', { lang: state.lang === 'en' ? 'English' : 'አማርኛ' }));
     };
@@ -905,14 +1139,12 @@
     //  NAVIGATION
     // =====================================================
     window.navigateTo = function(screen) {
-        // if not logged in, force onboarding
         if (!state.isLoggedIn && screen !== 'onboarding' && screen !== 'login' && screen !== 'signup') {
             state.screen = 'onboarding';
             render();
             return;
         }
         state.screen = screen;
-        // update nav tabs
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.classList.toggle('active', tab.dataset.tab === screen);
         });
@@ -926,7 +1158,6 @@
         const container = document.getElementById('screenContainer');
         let html = '';
 
-        // if not logged in, show auth flow
         if (!state.isLoggedIn) {
             if (state.screen === 'signup') {
                 html = renderSignup();
@@ -940,7 +1171,6 @@
             return;
         }
 
-        // logged in: show screens
         switch (state.screen) {
             case 'dashboard':
                 html = renderDashboard();
@@ -967,13 +1197,16 @@
         container.innerHTML = `<div class="fade-in">${html}</div>`;
         updateNavVisibility(true);
         updateActiveTab();
+
+        // Show daily quote if not shown today and user is logged in
+        if (state.isLoggedIn && !state.quoteShownToday) {
+            setTimeout(() => showDailyQuote(), 600);
+        }
     }
 
     function updateNavVisibility(show) {
         const nav = document.querySelector('.nav-tabs');
-        if (nav) {
-            nav.style.display = show ? 'flex' : 'none';
-        }
+        if (nav) nav.style.display = show ? 'flex' : 'none';
     }
 
     function updateActiveTab() {
@@ -983,7 +1216,7 @@
     }
 
     // =====================================================
-    //  ONBOARDING
+    //  ONBOARDING / AUTH
     // =====================================================
     function renderOnboarding() {
         return `
@@ -992,10 +1225,8 @@
                 <div style="font-size:26px; font-weight:800; background:linear-gradient(135deg,#0891b2,#0d9488); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${_('app_name')}</div>
                 <div style="color:#475569; font-weight:500; font-size:14px;">${_('choose_lang')}</div>
             </div>
-
             <div style="font-weight:700; font-size:20px; margin-top:8px;">${_('choose_lang')}</div>
             <div style="color:#64748b; margin-bottom:14px;">${_('choose_lang_sub')}</div>
-
             <div class="lang-card selected" onclick="selectLanguage('en')">
                 <span style="font-size:28px;">🇬🇧</span>
                 <div><div style="font-weight:700;">${_('english')}</div><div style="color:#64748b;">English</div></div>
@@ -1006,7 +1237,6 @@
                 <div><div style="font-weight:700;">${_('amharic')}</div><div style="color:#64748b; font-size:18px; font-family:'Noto Sans Ethiopic',sans-serif;">አማርኛ</div></div>
                 <span class="check">✓</span>
             </div>
-
             <button class="btn btn-primary mt-2" onclick="selectLanguageAndContinue()">${_('continue')}</button>
             <div style="font-size:12px; color:#94a3b8; text-align:center; margin-top:10px;">By continuing you agree to Terms & Privacy</div>
         `;
@@ -1014,14 +1244,12 @@
 
     window.selectLanguage = function(lang) {
         document.querySelectorAll('.lang-card').forEach(el => el.classList.remove('selected'));
-        // find the one with the flag
         document.querySelectorAll('.lang-card').forEach(el => {
             if (el.querySelector(`[style*="${lang === 'en' ? '🇬🇧' : '🇪🇹'}"]`)) {
                 el.classList.add('selected');
             }
         });
         state.lang = lang;
-        // update header toggle
         const icon = document.getElementById('langIcon');
         const label = document.getElementById('langLabel');
         if (lang === 'am') {
@@ -1040,19 +1268,14 @@
         render();
     };
 
-    // =====================================================
-    //  LOGIN
-    // =====================================================
     function renderLogin() {
         return `
             <div style="font-weight:700; font-size:22px;">${_('welcome_back')}</div>
             <div style="color:#64748b; margin-bottom:16px;">${_('sign_in')} to access your diabetes data</div>
-
             <div class="flex-row" style="margin-bottom:16px;">
                 <button class="auth-tab active" onclick="switchAuth('login')">${_('sign_in')}</button>
                 <button class="auth-tab" onclick="switchAuth('signup')">${_('create_account')}</button>
             </div>
-
             <div class="form-group">
                 <label style="font-weight:600; font-size:14px; color:#475569;">📧 ${_('email_phone')}</label>
                 <input class="glucose-input" type="text" placeholder="Enter email or phone" value="alemu@example.com" />
@@ -1061,9 +1284,8 @@
                 <label style="font-weight:600; font-size:14px; color:#475569;">🔒 ${_('password')}</label>
                 <input class="glucose-input" type="password" placeholder="Enter password" value="••••••••" />
             </div>
-
             <button class="btn btn-primary mt-2" onclick="handleLogin()">🔑 ${_('sign_in')}</button>
-            <div style="text-align:right; margin-top:6px; color:#0891b2; font-weight:600; font-size:14px; cursor:pointer;" onclick="showToast('📧 Password reset link sent to your email')">${_('forgot_password')}</div>
+            <div style="text-align:right; margin-top:6px; color:#0891b2; font-weight:600; font-size:14px; cursor:pointer;" onclick="showToast('📧 Password reset link sent')">${_('forgot_password')}</div>
         `;
     }
 
@@ -1082,23 +1304,19 @@
     window.handleLogin = function() {
         state.isLoggedIn = true;
         state.screen = 'dashboard';
+        state.quoteShownToday = false; // reset so quote shows on login
         showToast(_('toast_login_success'));
         render();
     };
 
-    // =====================================================
-    //  SIGNUP
-    // =====================================================
     function renderSignup() {
         return `
             <div style="font-weight:700; font-size:22px;">📝 ${_('create_account')}</div>
             <div style="color:#64748b; margin-bottom:14px;">Complete your profile to get started</div>
-
             <div class="flex-row" style="margin-bottom:14px;">
                 <button class="auth-tab" onclick="switchAuth('login')">${_('sign_in')}</button>
                 <button class="auth-tab active" onclick="switchAuth('signup')">${_('create_account')}</button>
             </div>
-
             <div class="form-group">
                 <label style="font-weight:600; font-size:13px; color:#475569;">👤 ${_('full_name')}</label>
                 <input class="glucose-input" type="text" placeholder="Enter your full name" value="Alemu Tadesse" />
@@ -1115,7 +1333,6 @@
                 <label style="font-weight:600; font-size:13px; color:#475569;">🔒 ${_('password')}</label>
                 <input class="glucose-input" type="password" placeholder="Create a password" value="••••••••" />
             </div>
-
             <div class="grid-2 mt-1">
                 <div class="form-group">
                     <label style="font-weight:600; font-size:13px; color:#475569;">🩸 ${_('diabetes_type')}</label>
@@ -1130,7 +1347,6 @@
                     <input class="glucose-input" type="date" value="2018-01-15" />
                 </div>
             </div>
-
             <div class="form-group mt-1">
                 <label style="font-weight:600; font-size:13px; color:#475569;">🩸 ${_('blood_group')}</label>
                 <select class="glucose-input" style="padding:10px 12px;">
@@ -1140,7 +1356,6 @@
                     <option value="O+" selected>O+</option><option value="O-">O-</option>
                 </select>
             </div>
-
             <div class="form-group mt-1">
                 <label style="font-weight:600; font-size:13px; color:#475569;">🔬 ${_('testing_method')}</label>
                 <select class="glucose-input" style="padding:10px 12px;">
@@ -1150,7 +1365,6 @@
                     <option value="multiple">${_('multiple')}</option>
                 </select>
             </div>
-
             <div class="form-group mt-1">
                 <label style="font-weight:600; font-size:13px; color:#475569;">⏰ ${_('testing_frequency')}</label>
                 <select class="glucose-input" style="padding:10px 12px;">
@@ -1160,7 +1374,6 @@
                     <option value="custom">${_('custom_freq')}</option>
                 </select>
             </div>
-
             <button class="btn btn-primary mt-2" onclick="handleSignup()">${_('create_btn')}</button>
         `;
     }
@@ -1168,18 +1381,22 @@
     window.handleSignup = function() {
         state.isLoggedIn = true;
         state.screen = 'dashboard';
+        state.quoteShownToday = false;
         showToast(_('toast_account_created'));
         render();
     };
 
     // =====================================================
-    //  DASHBOARD
+    //  DASHBOARD (with quote badge)
     // =====================================================
     function renderDashboard() {
         const avg = getDailyAverage(state.today);
         const readingsToday = getReadingsForDate(state.today);
         const count = readingsToday.length;
+        const quote = getDailyQuote();
         const isAm = state.lang === 'am';
+        const quoteText = isAm ? quote.am.text : quote.en.text;
+        const shortQuote = quoteText.length > 40 ? quoteText.substring(0, 38) + '…' : quoteText;
 
         return `
             <div class="flex-between">
@@ -1187,7 +1404,14 @@
                 <div style="font-weight:800; font-size:22px;">${state.user.name}</div></div>
                 <button class="btn btn-danger btn-sm" style="width:auto; padding:8px 14px; border-radius:40px;" onclick="navigateTo('emergency')">🚨</button>
             </div>
-            <div style="color:#0891b2; font-weight:500; margin-bottom:14px; font-size:14px;">${state.today} · Wednesday</div>
+            <div style="color:#0891b2; font-weight:500; margin-bottom:10px; font-size:14px;">${state.today} · Wednesday</div>
+
+            <!-- Daily Quote Badge -->
+            <div class="quote-badge" onclick="showDailyQuote()">
+                <span class="icon">${quote.icon}</span>
+                <span class="preview ${isAm ? 'amharic' : ''}">"${shortQuote}"</span>
+                <span class="lang-tag">${isAm ? 'አማ' : 'EN'}</span>
+            </div>
 
             <div class="grid-2">
                 <div class="card" style="padding:14px; text-align:center;">
@@ -1230,7 +1454,7 @@
 
             <div class="card" style="background:#fef3c7; border-left:4px solid #f59e0b; margin-top:6px;">
                 <div class="flex-between">
-                    <span style="font-weight:600; font-size:14px; color:#92400e;">${isAm ? '🕊️ የጾም ጊዜ' : '🕊️ Fasting Mode'}</span>
+                    <span style="font-weight:600; font-size:14px; color:#92400e;">🕊️ ${_('fasting_mode')}</span>
                     <span style="font-size:13px; color:#92400e;">${state.user.fastingMode ? '✅ ' + _('fasting_active') : '⏸️ ' + _('fasting_inactive')}</span>
                 </div>
                 <button class="btn btn-sm btn-secondary" style="width:auto; padding:6px 16px; margin-top:6px; font-size:13px;" onclick="toggleFastingMode()">
@@ -1314,7 +1538,6 @@
         const current = getReading(meal, time, state.today);
         const val = prompt(`Enter ${meal} ${time} glucose (mg/dL):`, current || '');
         if (val !== null && !isNaN(val) && val >= 20 && val <= 600) {
-            // update or add
             const existing = state.readings.find(r => r.date === state.today && r.meal === meal && r.time === time);
             if (existing) {
                 existing.value = parseInt(val);
@@ -1383,8 +1606,6 @@
     // =====================================================
     function renderMedications() {
         const meds = state.medications;
-        const isAm = state.lang === 'am';
-
         return `
             <div class="flex-between">
                 <span style="font-weight:700; font-size:20px;">💊 ${_('medications_title')}</span>
@@ -1529,7 +1750,7 @@
     // =====================================================
     render();
 
-    // make functions globally accessible for inline onclick
+    // expose functions globally
     window.navigateTo = navigateTo;
     window.toggleLanguage = toggleLanguage;
     window.switchAuth = switchAuth;
@@ -1541,7 +1762,8 @@
     window.editReading = editReading;
     window.addMedication = addMedication;
     window.showToast = showToast;
+    window.showDailyQuote = showDailyQuote;
+    window.closeQuote = closeQuote;
 </script>
-
 </body>
 </html>
