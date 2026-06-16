@@ -1,793 +1,1546 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
-  <title>ETHIOB Diabetes · Complete Demo</title>
-  <!-- Font & Icons (Inter & Lucide via CDN) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" />
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, system-ui, sans-serif;
-      background: #f1f5f9;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 24px 16px;
-    }
-
-    /* mobile container */
-    .phone {
-      max-width: 420px;
-      width: 100%;
-      background: #f8fafc;
-      border-radius: 40px 40px 28px 28px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-      overflow: hidden;
-      position: relative;
-      border: 1px solid rgba(255,255,255,0.3);
-    }
-
-    /* fake notch / header */
-    .status-bar {
-      background: white;
-      padding: 14px 20px 8px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      font-weight: 600;
-      color: #0f172a;
-      border-bottom: 1px solid #e9edf2;
-    }
-    .status-bar span:last-child {
-      color: #0891b2;
-    }
-
-    /* main content area */
-    .screen {
-      padding: 16px 20px 24px;
-      background: #f8fafc;
-      transition: all 0.2s;
-    }
-
-    /* cards, pills, inputs */
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 18px 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-      margin-bottom: 16px;
-      transition: 0.15s;
-    }
-    .card-soft {
-      background: #f1f5f9;
-      border-radius: 16px;
-      padding: 16px;
-    }
-
-    .flex-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .flex-between {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .badge {
-      background: #e0f2fe;
-      color: #0369a1;
-      padding: 4px 12px;
-      border-radius: 40px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .badge-red {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-    .badge-green {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .glucose-input {
-      background: #f8fafc;
-      border: 2px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 16px;
-      width: 100%;
-      transition: 0.15s;
-    }
-    .glucose-input:focus {
-      border-color: #0891b2;
-      outline: none;
-      background: white;
-      box-shadow: 0 0 0 4px rgba(8,145,178,0.08);
-    }
-
-    .btn {
-      border: none;
-      border-radius: 40px;
-      font-weight: 600;
-      padding: 12px 20px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: 0.15s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-    }
-    .btn-primary {
-      background: #0891b2;
-      color: white;
-    }
-    .btn-primary:hover {
-      background: #0d9488;
-      transform: scale(0.98);
-    }
-    .btn-outline {
-      background: transparent;
-      border: 2px solid #0891b2;
-      color: #0891b2;
-    }
-    .btn-outline:hover {
-      background: #f0fdfa;
-    }
-    .btn-danger {
-      background: #dc2626;
-      color: white;
-    }
-    .btn-danger:hover {
-      background: #b91c1c;
-    }
-
-    .toggle {
-      width: 48px;
-      height: 28px;
-      background: #cbd5e1;
-      border-radius: 40px;
-      position: relative;
-      cursor: pointer;
-      transition: 0.2s;
-      flex-shrink: 0;
-    }
-    .toggle.active {
-      background: #0891b2;
-    }
-    .toggle .dot {
-      width: 22px;
-      height: 22px;
-      background: white;
-      border-radius: 40px;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      transition: 0.2s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-    }
-    .toggle.active .dot {
-      left: 23px;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 40px;
-      display: inline-block;
-    }
-    .dot-green { background: #10b981; }
-    .dot-yellow { background: #f59e0b; }
-    .dot-red { background: #ef4444; }
-    .dot-gray { background: #94a3b8; }
-
-    .meal-icon { font-size: 24px; }
-    .pill-day {
-      background: white;
-      border-radius: 40px;
-      padding: 8px 12px;
-      text-align: center;
-      min-width: 44px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .pill-day.active {
-      border-color: #0891b2;
-      background: #f0fdfa;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .divider {
-      border: none;
-      border-top: 2px solid #e9edf2;
-      margin: 16px 0;
-    }
-
-    /* progress dots */
-    .dots {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      padding: 8px 0 12px;
-    }
-    .dot-indicator {
-      width: 10px;
-      height: 10px;
-      border-radius: 40px;
-      background: #d1d5db;
-      transition: 0.2s;
-    }
-    .dot-indicator.active {
-      background: #0891b2;
-      width: 28px;
-    }
-
-    .lang-card {
-      border: 2px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .lang-card.selected {
-      border-color: #0891b2;
-      background: #f0fdfa;
-    }
-
-    /* emergency card special */
-    .emergency-banner {
-      background: #dc2626;
-      color: white;
-      text-align: center;
-      padding: 12px;
-      border-radius: 20px 20px 0 0;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-
-    /* responsive tiny */
-    @media (max-width: 420px) {
-      .phone { border-radius: 28px; }
-      .screen { padding: 12px 14px; }
-    }
-
-    /* utils */
-    .mt-2 { margin-top: 12px; }
-    .mt-4 { margin-top: 20px; }
-    .mb-2 { margin-bottom: 12px; }
-    .gap-2 { gap: 8px; }
-    .text-muted { color: #64748b; font-size: 14px; }
-    .text-small { font-size: 13px; }
-    .font-bold { font-weight: 700; }
-    .text-center { text-align: center; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ETHIOB Diabetes · Full Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background: #e9edf2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .app {
+            max-width: 440px;
+            width: 100%;
+            background: #f8fafc;
+            border-radius: 32px;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            position: relative;
+        }
+        .app-header {
+            background: white;
+            padding: 16px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9edf2;
+        }
+        .app-header .logo {
+            font-weight: 800;
+            font-size: 18px;
+            background: linear-gradient(135deg, #0891b2, #0d9488);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .app-header .lang-toggle {
+            background: #f1f5f9;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #0f172a;
+            transition: 0.15s;
+        }
+        .app-header .lang-toggle:hover {
+            background: #e2e8f0;
+        }
+        .app-header .lang-toggle.active {
+            background: #0891b2;
+            color: white;
+        }
+        .screen {
+            padding: 16px 20px 20px;
+            min-height: 520px;
+            background: #f8fafc;
+        }
+        /* nav tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            background: white;
+            padding: 8px 12px;
+            border-top: 1px solid #e9edf2;
+            justify-content: space-around;
+        }
+        .nav-tab {
+            background: none;
+            border: none;
+            padding: 8px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: 0.15s;
+            flex: 1;
+            max-width: 70px;
+        }
+        .nav-tab:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .nav-tab.active {
+            color: #0891b2;
+            background: #f0fdfa;
+        }
+        .nav-tab .icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+        .nav-tab .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        /* cards */
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            margin-bottom: 14px;
+        }
+        .card-soft {
+            background: #f1f5f9;
+            border-radius: 14px;
+            padding: 14px;
+        }
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gap-1 {
+            gap: 6px;
+        }
+        .gap-2 {
+            gap: 12px;
+        }
+        .mt-1 {
+            margin-top: 8px;
+        }
+        .mt-2 {
+            margin-top: 14px;
+        }
+        .mb-1 {
+            margin-bottom: 8px;
+        }
+        .mb-2 {
+            margin-bottom: 14px;
+        }
+        .text-muted {
+            color: #64748b;
+            font-size: 14px;
+        }
+        .text-small {
+            font-size: 13px;
+        }
+        .font-bold {
+            font-weight: 700;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-red {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .badge-green {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-yellow {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .glucose-input {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-size: 16px;
+            width: 100%;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .glucose-input:focus {
+            border-color: #0891b2;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.08);
+        }
+        .glucose-input::placeholder {
+            color: #94a3b8;
+        }
+        .btn {
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            padding: 12px 20px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: #0891b2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0d9488;
+            transform: scale(0.98);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #0891b2;
+            color: #0891b2;
+        }
+        .btn-outline:hover {
+            background: #f0fdfa;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+            width: auto;
+        }
+        .toggle {
+            width: 48px;
+            height: 28px;
+            background: #cbd5e1;
+            border-radius: 40px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .toggle.active {
+            background: #0891b2;
+        }
+        .toggle .dot {
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 40px;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+        .toggle.active .dot {
+            left: 23px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .dot-green {
+            background: #10b981;
+        }
+        .dot-yellow {
+            background: #f59e0b;
+        }
+        .dot-red {
+            background: #ef4444;
+        }
+        .dot-gray {
+            background: #94a3b8;
+        }
+        .pill-day {
+            background: white;
+            border-radius: 40px;
+            padding: 8px 10px;
+            text-align: center;
+            min-width: 40px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: 0.1s;
+            flex: 1;
+        }
+        .pill-day.active {
+            border-color: #0891b2;
+            background: #f0fdfa;
+        }
+        .pill-day .day-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .pill-day .day-num {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+        .divider {
+            border: none;
+            border-top: 2px solid #e9edf2;
+            margin: 14px 0;
+        }
+        .lang-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+            background: white;
+        }
+        .lang-card.selected {
+            border-color: #0891b2;
+            background: #f0fdfa;
+        }
+        .lang-card .check {
+            margin-left: auto;
+            color: #0891b2;
+            opacity: 0.3;
+            font-size: 18px;
+        }
+        .lang-card.selected .check {
+            opacity: 1;
+        }
+        .emergency-banner {
+            background: #dc2626;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 18px 18px 0 0;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            font-size: 14px;
+        }
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .auth-tab.active {
+            background: #0891b2;
+            color: white;
+        }
+        .auth-tab:hover:not(.active) {
+            background: #e2e8f0;
+        }
+        .meal-icon {
+            font-size: 22px;
+        }
+        .reading-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .reading-row:last-child {
+            border-bottom: none;
+        }
+        /* amharic font */
+        .amharic {
+            font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif;
+        }
+        /* responsive */
+        @media (max-width: 480px) {
+            .app {
+                border-radius: 20px;
+            }
+            .screen {
+                padding: 12px 14px;
+                min-height: 440px;
+            }
+            .nav-tab .label {
+                font-size: 9px;
+            }
+        }
+        .hidden {
+            display: none !important;
+        }
+        .fade-in {
+            animation: fadeIn 0.25s ease-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0;
+            transition: 0.3s;
+            max-width: 90%;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
 </head>
 <body>
 
-<div class="phone" id="app">
-  <!-- status bar -->
-  <div class="status-bar">
-    <span>9:41</span>
-    <span>📶 📶 🔋</span>
-  </div>
+<div class="app" id="app">
+    <!-- Header with logo and lang toggle -->
+    <div class="app-header">
+        <span class="logo">🏥 ETHIOB</span>
+        <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">
+            <span id="langIcon">🇬🇧</span> <span id="langLabel">EN</span>
+        </button>
+    </div>
 
-  <!-- ============== DYNAMIC SCREEN ============== -->
-  <div id="screenContainer" class="screen">
-    <!-- content rendered by js -->
-  </div>
+    <!-- Screen -->
+    <div class="screen" id="screenContainer">
+        <!-- rendered by JS -->
+    </div>
 
-  <!-- bottom nav (simple) -->
-  <div style="background: white; border-top: 1px solid #e9edf2; padding: 12px 20px; display: flex; justify-content: space-around; font-size: 11px; color: #64748b;">
-    <span style="display:flex; flex-direction:column; align-items:center; gap:2px; color:#0891b2; font-weight:600;">🏠 Home</span>
-    <span style="display:flex; flex-direction:column; align-items:center; gap:2px;">📊 Logs</span>
-    <span style="display:flex; flex-direction:column; align-items:center; gap:2px;">💊 Meds</span>
-    <span style="display:flex; flex-direction:column; align-items:center; gap:2px;">👤 Profile</span>
-  </div>
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="dashboard" onclick="navigateTo('dashboard')">
+            <span class="icon">🏠</span>
+            <span class="label" data-key="nav_home">Home</span>
+        </button>
+        <button class="nav-tab" data-tab="tracking" onclick="navigateTo('tracking')">
+            <span class="icon">📊</span>
+            <span class="label" data-key="nav_logs">Logs</span>
+        </button>
+        <button class="nav-tab" data-tab="medications" onclick="navigateTo('medications')">
+            <span class="icon">💊</span>
+            <span class="label" data-key="nav_meds">Meds</span>
+        </button>
+        <button class="nav-tab" data-tab="emergency" onclick="navigateTo('emergency')">
+            <span class="icon">🚨</span>
+            <span class="label" data-key="nav_emergency">Emergency</span>
+        </button>
+        <button class="nav-tab" data-tab="profile" onclick="navigateTo('profile')">
+            <span class="icon">👤</span>
+            <span class="label" data-key="nav_profile">Profile</span>
+        </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 </div>
 
 <script>
-  // ------------------------------------------------
-  //  STATE & DATA
-  // ------------------------------------------------
-  let state = {
-    screen: 'onboarding',        // onboarding | login | profile | emergency | dashboard | tracking | hba1c | medications | reports
-    lang: 'en',                 // en / am
-    user: {
-      name: 'Alemu Tadesse',
-      email: 'alemu@example.com',
-      phone: '+251-911-234567',
-      diabetesType: 'Type 2',
-      diagnosisDate: '2018-01-15',
-      bloodGroup: 'O+',
-      hospital: 'Black Lion Hospital',
-      specialist: 'Dr. Kebede Bekele',
-      specialistPhone: '+251-111-234567',
-      emergencyName: 'Selam Tesfaye',
-      emergencyPhone: '+251-911-234567',
-      emergencyAddress: 'Addis Ababa, Ethiopia',
-      relation: 'Wife'
-    },
-    readings: [
-      { date: '2026-06-15', meal: 'breakfast', time: 'before', value: 145 },
-      { date: '2026-06-15', meal: 'breakfast', time: 'after', value: 168 },
-      { date: '2026-06-15', meal: 'lunch', time: 'before', value: 158 },
-      { date: '2026-06-15', meal: 'lunch', time: 'after', value: 172 },
-      { date: '2026-06-14', meal: 'breakfast', time: 'before', value: 132 },
-      { date: '2026-06-14', meal: 'breakfast', time: 'after', value: 145 },
-      { date: '2026-06-14', meal: 'lunch', time: 'before', value: 128 },
-      { date: '2026-06-14', meal: 'lunch', time: 'after', value: 152 },
-      { date: '2026-06-13', meal: 'breakfast', time: 'before', value: 118 },
-      { date: '2026-06-13', meal: 'breakfast', time: 'after', value: 135 },
-    ],
-    medications: [
-      { id:1, name:'Levemir', type:'Long-Acting Insulin', morning:12, afternoon:null, night:10, unit:'units', active:true, reminder:true },
-      { id:2, name:'Novorapid', type:'Short-Acting Insulin', morning:4, afternoon:6, night:8, unit:'units', active:true, reminder:true },
-      { id:3, name:'Metformin', type:'Oral Medication', morning:500, afternoon:null, night:500, unit:'mg', active:true, reminder:false },
-      { id:4, name:'Lisinopril', type:'Blood Pressure', morning:10, afternoon:null, night:null, unit:'mg', active:true, reminder:false },
-    ],
-    // temporary/fasting flag
-    fastingMode: false,
-    // current date for tracking
-    today: '2026-06-15'
-  };
+    // =====================================================
+    //  STATE
+    // =====================================================
+    const state = {
+        lang: 'en', // 'en' or 'am'
+        screen: 'dashboard',
+        user: {
+            name: 'Alemu Tadesse',
+            email: 'alemu@example.com',
+            phone: '+251-911-234567',
+            diabetesType: 'Type 2',
+            diagnosisDate: '2018-01-15',
+            bloodGroup: 'O+',
+            hospital: 'Black Lion Hospital',
+            specialist: 'Dr. Kebede Bekele',
+            specialistPhone: '+251-111-234567',
+            emergencyName: 'Selam Tesfaye',
+            emergencyPhone: '+251-911-234567',
+            emergencyAddress: 'Addis Ababa, Ethiopia',
+            relation: 'Wife',
+            testingMethod: 'glucose_meter', // glucose_meter, cgm, lab
+            testingFrequency: 'frequent', // frequent, moderate, basic
+            fastingMode: false,
+        },
+        readings: [
+            { date: '2026-06-15', meal: 'breakfast', time: 'before', value: 145 },
+            { date: '2026-06-15', meal: 'breakfast', time: 'after', value: 168 },
+            { date: '2026-06-15', meal: 'lunch', time: 'before', value: 158 },
+            { date: '2026-06-15', meal: 'lunch', time: 'after', value: 172 },
+            { date: '2026-06-14', meal: 'breakfast', time: 'before', value: 132 },
+            { date: '2026-06-14', meal: 'breakfast', time: 'after', value: 145 },
+            { date: '2026-06-14', meal: 'lunch', time: 'before', value: 128 },
+            { date: '2026-06-14', meal: 'lunch', time: 'after', value: 152 },
+            { date: '2026-06-13', meal: 'breakfast', time: 'before', value: 118 },
+            { date: '2026-06-13', meal: 'breakfast', time: 'after', value: 135 },
+        ],
+        medications: [
+            { id: 1, name: 'Levemir', type: 'Long-Acting Insulin', morning: 12, afternoon: null, night: 10, unit: 'units',
+                active: true, reminder: true },
+            { id: 2, name: 'Novorapid', type: 'Short-Acting Insulin', morning: 4, afternoon: 6, night: 8, unit: 'units',
+                active: true, reminder: true },
+            { id: 3, name: 'Metformin', type: 'Oral Medication', morning: 500, afternoon: null, night: 500, unit: 'mg',
+                active: true, reminder: false },
+            { id: 4, name: 'Lisinopril', type: 'Blood Pressure', morning: 10, afternoon: null, night: null, unit: 'mg',
+                active: true, reminder: false },
+        ],
+        // temporary medications
+        tempMeds: [],
+        today: '2026-06-15',
+        // auth state
+        isLoggedIn: false,
+        showSignup: false,
+        // onboarding step
+        onboardingStep: 0,
+    };
 
-  // helpers
-  function getReadingsForDate(date) {
-    return state.readings.filter(r => r.date === date);
-  }
+    // =====================================================
+    //  TRANSLATIONS (EN / AM)
+    // =====================================================
+    const t = {
+        en: {
+            app_name: 'ETHIOB Diabetes',
+            nav_home: 'Home',
+            nav_logs: 'Logs',
+            nav_meds: 'Meds',
+            nav_emergency: 'Emergency',
+            nav_profile: 'Profile',
+            // onboarding
+            choose_lang: 'Choose Your Language',
+            choose_lang_sub: 'Select your preferred language',
+            english: 'English',
+            amharic: 'Amharic',
+            continue: 'Continue →',
+            // login
+            welcome_back: 'Welcome Back',
+            sign_in: 'Sign In',
+            create_account: 'Create Account',
+            email_phone: 'Email or Phone',
+            password: 'Password',
+            forgot_password: 'Forgot password?',
+            // signup
+            full_name: 'Full Name',
+            phone_number: 'Phone Number',
+            diabetes_type: 'Diabetes Type',
+            type1: 'Type 1',
+            type2: 'Type 2',
+            gestational: 'Gestational',
+            diagnosis_date: 'Diagnosis Date',
+            blood_group: 'Blood Group',
+            testing_method: 'Testing Method',
+            glucose_meter: 'Glucose Meter (Finger prick)',
+            cgm: 'CGM (Continuous Monitor)',
+            lab: 'Laboratory Tests',
+            multiple: 'Multiple Methods',
+            testing_frequency: 'Testing Frequency',
+            frequent: 'Frequent (5-7x daily)',
+            moderate: 'Moderate (3-4x daily)',
+            basic: 'Basic (1-2x daily)',
+            custom_freq: 'Custom',
+            create_btn: '✨ Create Account',
+            // dashboard
+            good_morning: 'Good morning',
+            avg_glucose: 'Avg Glucose',
+            est_hba1c: 'Est. HbA1c',
+            today_readings: "Today's Readings",
+            readings_logged: 'readings logged',
+            log_glucose: 'Log Glucose',
+            hba1c_btn: 'HbA1c',
+            meds_btn: 'Meds',
+            profile_btn: 'Profile',
+            reports_btn: 'Reports',
+            fasting_mode: 'Fasting Mode',
+            fasting_active: 'Active (የጾም ጊዜ) — adjust insulin',
+            fasting_inactive: 'Inactive',
+            toggle: 'Toggle',
+            // tracking
+            weekly_log: 'Weekly Log',
+            daily_average: 'Daily Average Result (DAR)',
+            excellent: '✨ Excellent Control',
+            good: '👍 Good Control',
+            needs_attention: '⚠️ Needs Attention',
+            before_meal: 'Before',
+            after_meal: '2h After',
+            breakfast: 'Breakfast',
+            lunch: 'Lunch',
+            dinner: 'Dinner',
+            // emergency
+            emergency_title: 'EMERGENCY MEDICAL ID · SHOW TO FIRST RESPONDER',
+            blood_type: 'Blood Type',
+            hospital: 'Hospital',
+            specialist: 'Specialist',
+            emergency_contact: 'EMERGENCY CONTACT',
+            latest_readings: 'LATEST READINGS (24h)',
+            call: 'Call',
+            share: 'Share',
+            // medications
+            medications_title: 'Medications',
+            active: 'Active',
+            reminders: 'Reminders',
+            morning: 'Morning',
+            afternoon: 'Afternoon',
+            night: 'Night',
+            total: 'Total',
+            reminder_label: 'Reminder',
+            add_med: 'Add Medication',
+            fasting_season: 'Fasting Season Mode',
+            fasting_enable: 'Enable Fasting Mode',
+            fasting_disable: 'Disable Fasting Mode',
+            // profile
+            medical_info: 'Medical Information',
+            edit: 'Edit',
+            emergency_contact_label: 'Emergency Contact',
+            settings: 'Settings',
+            language: 'Language',
+            notifications: 'Notifications',
+            cloud_sync: 'Cloud Sync',
+            // reports
+            reports_title: 'Reports',
+            generate_report: 'Generate New Report',
+            quick_summary: 'Quick Summary',
+            full_report: 'Full Report',
+            monthly_summary: 'Monthly Summary',
+            view: 'View',
+            pdf: 'PDF',
+            share_report: 'Share',
+            emergency_id_card: 'Emergency Medical ID',
+            view_card: 'View Card',
+            // common
+            back: '← Back',
+            save: 'Save',
+            cancel: 'Cancel',
+            delete: 'Delete',
+            ok: 'OK',
+            // toast messages
+            toast_lang_changed: 'Language changed to {lang}',
+            toast_reading_saved: '✅ Reading saved!',
+            toast_med_added: '✅ Medication added!',
+            toast_account_created: '🎉 Account created! Welcome to ETHIOB.',
+            toast_login_success: '🔑 Welcome back!',
+            toast_emergency_shared: '✅ Emergency card shared',
+            toast_emergency_called: '📞 Calling emergency contact...',
+            toast_report_generated: '📄 Report generated!',
+        },
+        am: {
+            app_name: 'ETHIOB የስኳር ህመም',
+            nav_home: 'መነሻ',
+            nav_logs: 'መዝገቦች',
+            nav_meds: 'መድሃኒቶች',
+            nav_emergency: 'ድንገተኛ',
+            nav_profile: 'መገለጫ',
+            choose_lang: 'ቋንቋ ይምረጡ',
+            choose_lang_sub: 'የሚመርጡትን ቋንቋ ይምረጡ',
+            english: 'እንግሊዝኛ',
+            amharic: 'አማርኛ',
+            continue: 'ቀጥል →',
+            welcome_back: 'እንኳን ደህና መጣህ',
+            sign_in: 'ግባ',
+            create_account: 'መለያ ፍጠር',
+            email_phone: 'ኢሜል ወይም ስልክ',
+            password: 'የይለፍ ቃል',
+            forgot_password: 'የይለፍ ቃል ረሱ?',
+            full_name: 'ሙሉ ስም',
+            phone_number: 'ስልክ ቁጥር',
+            diabetes_type: 'የስኳር ህመም ዓይነት',
+            type1: 'ዓይነት 1',
+            type2: 'ዓይነት 2',
+            gestational: 'የእርግዝና',
+            diagnosis_date: 'የምርመራ ቀን',
+            blood_group: 'የደም ዓይነት',
+            testing_method: 'የምርመራ ዘዴ',
+            glucose_meter: 'የግሉኮስ መለኪያ',
+            cgm: 'ቀጣይ መቆጣጠሪያ (CGM)',
+            lab: 'የላብራቶሪ ምርመራ',
+            multiple: 'በርካታ ዘዴዎች',
+            testing_frequency: 'የምርመራ ድግግሞሽ',
+            frequent: 'ተደጋጋሚ (5-7 ጊዜ)',
+            moderate: 'መካከለኛ (3-4 ጊዜ)',
+            basic: 'መሰረታዊ (1-2 ጊዜ)',
+            custom_freq: 'ብጁ',
+            create_btn: '✨ መለያ ፍጠር',
+            good_morning: 'እንደምን አደርክ',
+            avg_glucose: 'አማካይ ስኳር',
+            est_hba1c: 'የተገመተ HbA1c',
+            today_readings: 'የዛሬ ንባቦች',
+            readings_logged: 'ንባቦች ተመዝግበዋል',
+            log_glucose: 'ስኳር መዝግብ',
+            hba1c_btn: 'HbA1c',
+            meds_btn: 'መድሃኒቶች',
+            profile_btn: 'መገለጫ',
+            reports_btn: 'ሪፖርቶች',
+            fasting_mode: 'የጾም ሁኔታ',
+            fasting_active: 'ንቁ (የጾም ጊዜ) — ኢንሱሊን ያስተካክሉ',
+            fasting_inactive: 'እንቅስቃሴ የሌለ',
+            toggle: 'ቀይር',
+            weekly_log: 'ሳምንታዊ መዝገብ',
+            daily_average: 'የቀን አማካይ ውጤት (DAR)',
+            excellent: '✨ እጅግ ጥሩ ቁጥጥር',
+            good: '👍 ጥሩ ቁጥጥር',
+            needs_attention: '⚠️ ትኩረት ያስፈልጋል',
+            before_meal: 'ከምግብ በፊት',
+            after_meal: 'ከምግብ በኋላ (2ሰ)',
+            breakfast: 'ቁርስ',
+            lunch: 'ምሳ',
+            dinner: 'እራት',
+            emergency_title: 'የድንገተኛ ጊዜ መታወቂያ · ለአድናቂ አሳይ',
+            blood_type: 'የደም ዓይነት',
+            hospital: 'ሆስፒታል',
+            specialist: 'ስፔሻሊስት',
+            emergency_contact: 'የድንገተኛ ጊዜ እውቂያ',
+            latest_readings: 'የቅርብ ጊዜ ንባቦች (24ሰ)',
+            call: 'ደውል',
+            share: 'አጋራ',
+            medications_title: 'መድሃኒቶች',
+            active: 'ንቁ',
+            reminders: 'አስታዋሾች',
+            morning: 'ጠዋት',
+            afternoon: 'ከሰዓት',
+            night: 'ምሽት',
+            total: 'ጠቅላላ',
+            reminder_label: 'አስታዋሽ',
+            add_med: 'መድሃኒት ጨምር',
+            fasting_season: 'የጾም ጊዜ ሁኔታ',
+            fasting_enable: 'የጾም ሁኔታ አንቃ',
+            fasting_disable: 'የጾም ሁኔታ አጥፋ',
+            medical_info: 'የህክምና መረጃ',
+            edit: 'አርትዕ',
+            emergency_contact_label: 'የድንገተኛ ጊዜ እውቂያ',
+            settings: 'ቅንብሮች',
+            language: 'ቋንቋ',
+            notifications: 'ማስታወቂያዎች',
+            cloud_sync: 'ክላውድ ማመሳሰል',
+            reports_title: 'ሪፖርቶች',
+            generate_report: 'አዲስ ሪፖርት ፍጠር',
+            quick_summary: 'አጭር ማጠቃለያ',
+            full_report: 'ሙሉ ሪፖርት',
+            monthly_summary: 'ወርሃዊ ማጠቃለያ',
+            view: 'ተመልከት',
+            pdf: 'PDF',
+            share_report: 'አጋራ',
+            emergency_id_card: 'የድንገተኛ ጊዜ መታወቂያ',
+            view_card: 'ካርዱን ተመልከት',
+            back: '← ተመለስ',
+            save: 'አስቀምጥ',
+            cancel: 'ሰርዝ',
+            delete: 'አጥፋ',
+            ok: 'እሺ',
+            toast_lang_changed: 'ቋንቋ ወደ {lang} ተቀይሯል',
+            toast_reading_saved: '✅ ንባብ ተቀምጧል!',
+            toast_med_added: '✅ መድሃኒት ተጨምሯል!',
+            toast_account_created: '🎉 መለያ ተፈጥሯል! እንኳን ደህና መጣህ።',
+            toast_login_success: '🔑 እንኳን ደህና መጣህ!',
+            toast_emergency_shared: '✅ የድንገተኛ ጊዜ ካርድ ተጋርቷል',
+            toast_emergency_called: '📞 ወደ ድንገተኛ ጊዜ እውቂያ እየተደወለ...',
+            toast_report_generated: '📄 ሪፖርቱ ተዘጋጅቷል!',
+        }
+    };
 
-  function getDailyAverage(date) {
-    const dayReadings = getReadingsForDate(date);
-    if (dayReadings.length === 0) return null;
-    const sum = dayReadings.reduce((a,b) => a + b.value, 0);
-    return Math.round(sum / dayReadings.length);
-  }
-
-  function getStatusColor(value, type) {
-    if (!value) return '#94a3b8';
-    if (type === 'before') {
-      if (value < 70) return '#ef4444';
-      if (value <= 130) return '#10b981';
-      if (value <= 180) return '#f59e0b';
-      return '#ef4444';
-    } else {
-      if (value < 140) return '#10b981';
-      if (value <= 180) return '#f59e0b';
-      return '#ef4444';
+    // =====================================================
+    //  HELPERS
+    // =====================================================
+    function _(key, vars = {}) {
+        let text = t[state.lang][key] || key;
+        for (const [k, v] of Object.entries(vars)) {
+            text = text.replace(`{${k}}`, v);
+        }
+        return text;
     }
-  }
 
-  function getReading(meal, time, date) {
-    const found = state.readings.find(r => r.date === date && r.meal === meal && r.time === time);
-    return found ? found.value : null;
-  }
-
-  // ------------------------------------------------
-  //  RENDER ENGINE
-  // ------------------------------------------------
-  function render() {
-    const container = document.getElementById('screenContainer');
-    let html = '';
-
-    switch (state.screen) {
-      case 'onboarding': html = renderOnboarding(); break;
-      case 'login': html = renderLogin(); break;
-      case 'profile': html = renderProfile(); break;
-      case 'emergency': html = renderEmergency(); break;
-      case 'dashboard': html = renderDashboard(); break;
-      case 'tracking': html = renderTracking(); break;
-      case 'hba1c': html = renderHbA1c(); break;
-      case 'medications': html = renderMedications(); break;
-      case 'reports': html = renderReports(); break;
-      default: html = '<div class="card text-center">Screen not found</div>';
+    function getReadingsForDate(date) {
+        return state.readings.filter(r => r.date === date);
     }
 
-    container.innerHTML = html;
+    function getDailyAverage(date) {
+        const dayReadings = getReadingsForDate(date);
+        if (dayReadings.length === 0) return null;
+        const sum = dayReadings.reduce((a, b) => a + b.value, 0);
+        return Math.round(sum / dayReadings.length);
+    }
 
-    // re-init lucide icons
-    lucide.createIcons();
-  }
+    function getReading(meal, time, date) {
+        const found = state.readings.find(r => r.date === date && r.meal === meal && r.time === time);
+        return found ? found.value : null;
+    }
 
-  // ------------------------------------------------
-  //  SCREEN RENDERERS
-  // ------------------------------------------------
-  function renderOnboarding() {
-    return `
-      <div style="text-align:center; padding:8px 0 12px;">
-        <div style="font-size:52px; margin-bottom:4px;">🏥</div>
-        <div style="font-size:28px; font-weight:800; background:linear-gradient(135deg,#0891b2,#0d9488); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">ETHIOB Diabetes</div>
-        <div style="color:#475569; font-weight:500;">Management Log Book</div>
-      </div>
-      <div class="dots">
-        <span class="dot-indicator active"></span>
-        <span class="dot-indicator"></span>
-        <span class="dot-indicator"></span>
-        <span class="dot-indicator"></span>
-      </div>
-      <div style="font-weight:700; font-size:20px; margin-bottom:4px;">🌍 Choose Your Language</div>
-      <div style="color:#64748b; margin-bottom:16px;">የሚመርጡትን ቋንቋ ይምረጡ</div>
+    function getStatusColor(value, type) {
+        if (!value) return '#94a3b8';
+        if (type === 'before') {
+            if (value < 70) return '#ef4444';
+            if (value <= 130) return '#10b981';
+            if (value <= 180) return '#f59e0b';
+            return '#ef4444';
+        } else {
+            if (value < 140) return '#10b981';
+            if (value <= 180) return '#f59e0b';
+            return '#ef4444';
+        }
+    }
 
-      <div class="lang-card selected" onclick="selectLang('en')">
-        <span style="font-size:32px;">🇬🇧</span>
-        <div><div style="font-weight:700;">English</div><div style="color:#64748b;">English</div></div>
-        <span style="margin-left:auto; color:#0891b2;">✓</span>
-      </div>
-      <div class="lang-card mt-2" onclick="selectLang('am')">
-        <span style="font-size:32px;">🇪🇹</span>
-        <div><div style="font-weight:700;">Amharic</div><div style="color:#64748b; font-size:18px;">አማርኛ</div></div>
-        <span style="margin-left:auto; color:#0891b2; opacity:0.3;">✓</span>
-      </div>
+    function getStatusLabel(value, type) {
+        if (!value) return '—';
+        if (type === 'before') {
+            if (value < 70) return 'Low';
+            if (value <= 130) return 'Normal';
+            if (value <= 180) return 'Elevated';
+            return 'High';
+        } else {
+            if (value < 140) return 'Normal';
+            if (value <= 180) return 'Elevated';
+            return 'High';
+        }
+    }
 
-      <button class="btn btn-primary mt-4" onclick="goTo('login')">Continue →</button>
-      <div style="font-size:12px; color:#94a3b8; text-align:center; margin-top:12px;">By continuing you agree to Terms & Privacy</div>
-    `;
-  }
+    function showToast(message) {
+        const el = document.getElementById('toast');
+        el.textContent = message;
+        el.classList.add('show');
+        clearTimeout(el._timeout);
+        el._timeout = setTimeout(() => el.classList.remove('show'), 2800);
+    }
 
-  function renderLogin() {
-    return `
-      <div style="font-weight:700; font-size:22px;">👋 Welcome Back</div>
-      <div style="color:#64748b; margin-bottom:16px;">Sign in to access your diabetes data</div>
+    // =====================================================
+    //  LANGUAGE TOGGLE
+    // =====================================================
+    window.toggleLanguage = function() {
+        state.lang = state.lang === 'en' ? 'am' : 'en';
+        const btn = document.getElementById('langToggle');
+        const icon = document.getElementById('langIcon');
+        const label = document.getElementById('langLabel');
+        if (state.lang === 'am') {
+            icon.textContent = '🇪🇹';
+            label.textContent = 'አማ';
+            btn.classList.add('active');
+        } else {
+            icon.textContent = '🇬🇧';
+            label.textContent = 'EN';
+            btn.classList.remove('active');
+        }
+        // re-render
+        render();
+        showToast(_('toast_lang_changed', { lang: state.lang === 'en' ? 'English' : 'አማርኛ' }));
+    };
 
-      <div class="flex-row" style="margin-bottom:16px;">
-        <div style="flex:1; background:#0891b2; color:white; padding:10px; border-radius:40px; text-align:center; font-weight:600;">Sign In</div>
-        <div style="flex:1; background:#f1f5f9; color:#64748b; padding:10px; border-radius:40px; text-align:center; font-weight:600; cursor:pointer;" onclick="alert('Switch to signup')">Create Account</div>
-      </div>
+    // =====================================================
+    //  NAVIGATION
+    // =====================================================
+    window.navigateTo = function(screen) {
+        // if not logged in, force onboarding
+        if (!state.isLoggedIn && screen !== 'onboarding' && screen !== 'login' && screen !== 'signup') {
+            state.screen = 'onboarding';
+            render();
+            return;
+        }
+        state.screen = screen;
+        // update nav tabs
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === screen);
+        });
+        render();
+    };
 
-      <div class="form-group">
-        <label style="font-weight:600; font-size:14px; color:#475569;">📧 Email or Phone</label>
-        <input class="glucose-input" type="text" placeholder="Enter email or phone" value="alemu@example.com" />
-      </div>
-      <div class="form-group mt-2">
-        <label style="font-weight:600; font-size:14px; color:#475569;">🔒 Password</label>
-        <input class="glucose-input" type="password" placeholder="Enter password" value="••••••••" />
-      </div>
+    // =====================================================
+    //  RENDER ENGINE
+    // =====================================================
+    function render() {
+        const container = document.getElementById('screenContainer');
+        let html = '';
 
-      <button class="btn btn-primary mt-4" onclick="goTo('dashboard')">🔑 Sign In</button>
-      <div style="text-align:right; margin-top:6px; color:#0891b2; font-weight:600; font-size:14px; cursor:pointer;" onclick="alert('Password reset sent')">Forgot password?</div>
-    `;
-  }
+        // if not logged in, show auth flow
+        if (!state.isLoggedIn) {
+            if (state.screen === 'signup') {
+                html = renderSignup();
+            } else if (state.screen === 'login') {
+                html = renderLogin();
+            } else {
+                html = renderOnboarding();
+            }
+            container.innerHTML = `<div class="fade-in">${html}</div>`;
+            updateNavVisibility(false);
+            return;
+        }
 
-  function renderProfile() {
-    const u = state.user;
-    return `
-      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
-        <div style="width:72px; height:72px; background:linear-gradient(135deg,#0891b2,#0d9488); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:36px; box-shadow:0 4px 12px rgba(8,145,178,0.3);">👤</div>
-        <div>
-          <div style="font-weight:800; font-size:22px;">${u.name}</div>
-          <div style="color:#475569;">${u.email}</div>
-          <div style="background:#f0fdfa; color:#0891b2; padding:2px 12px; border-radius:40px; font-size:12px; font-weight:600; display:inline-block; margin-top:2px;">🩸 ${u.diabetesType} • Since 2018</div>
-        </div>
-      </div>
+        // logged in: show screens
+        switch (state.screen) {
+            case 'dashboard':
+                html = renderDashboard();
+                break;
+            case 'tracking':
+                html = renderTracking();
+                break;
+            case 'emergency':
+                html = renderEmergency();
+                break;
+            case 'medications':
+                html = renderMedications();
+                break;
+            case 'profile':
+                html = renderProfile();
+                break;
+            case 'reports':
+                html = renderReports();
+                break;
+            default:
+                html = renderDashboard();
+        }
 
-      <div class="card">
-        <div class="flex-between"><span style="font-weight:700;">🏥 Medical Information</span><span style="color:#0891b2; font-weight:600; cursor:pointer;" onclick="alert('Edit medical info')">✏️ Edit</span></div>
-        <div class="flex-between" style="padding:8px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">🩸 Diabetes Type</span><span style="font-weight:600;">${u.diabetesType}</span></div>
-        <div class="flex-between" style="padding:8px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">📅 Diagnosis Date</span><span style="font-weight:600;">${u.diagnosisDate}</span></div>
-        <div class="flex-between" style="padding:8px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">🩸 Blood Group</span><span style="font-weight:600;">${u.bloodGroup}</span></div>
-        <div class="flex-between" style="padding:8px 0;"><span style="color:#64748b;">🏥 Hospital</span><span style="font-weight:600;">${u.hospital}</span></div>
-      </div>
+        container.innerHTML = `<div class="fade-in">${html}</div>`;
+        updateNavVisibility(true);
+        updateActiveTab();
+    }
 
-      <div class="card">
-        <div class="flex-between"><span style="font-weight:700;">📞 Emergency Contact</span><span style="color:#0891b2; font-weight:600; cursor:pointer;" onclick="alert('Edit emergency contact')">✏️ Edit</span></div>
-        <div class="flex-between" style="padding:8px 0;"><span style="color:#64748b;">👤 ${u.emergencyName}</span><span style="font-weight:600;">${u.emergencyPhone}</span></div>
-        <div style="color:#64748b; font-size:14px;">${u.relation} • ${u.emergencyAddress}</div>
-      </div>
+    function updateNavVisibility(show) {
+        const nav = document.querySelector('.nav-tabs');
+        if (nav) {
+            nav.style.display = show ? 'flex' : 'none';
+        }
+    }
 
-      <div class="card">
-        <div style="font-weight:700;">⚙️ Settings</div>
-        <div class="flex-between" style="padding:8px 0;"><span>🌐 Language</span><span style="color:#0891b2; font-weight:500;">English ›</span></div>
-        <div class="flex-between" style="padding:8px 0;"><span>🔔 Notifications</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="dot"></div></div></div>
-        <div class="flex-between" style="padding:8px 0;"><span>☁️ Cloud Sync</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="dot"></div></div></div>
-      </div>
+    function updateActiveTab() {
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === state.screen);
+        });
+    }
 
-      <button class="btn btn-outline" onclick="goTo('dashboard')">← Back to Dashboard</button>
-    `;
-  }
-
-  function renderEmergency() {
-    const u = state.user;
-    // get latest readings (last 4)
-    const sorted = [...state.readings].sort((a,b) => b.date.localeCompare(a.date) || (a.time === 'after' ? 1 : -1));
-    const latest = sorted.slice(0,4);
-
-    return `
-      <div class="emergency-banner">🚨 EMERGENCY MEDICAL ID · SHOW TO FIRST RESPONDER</div>
-      <div class="card" style="border-radius:0 0 20px 20px; margin-top:0;">
-        <div style="text-align:center;">
-          <div style="font-size:48px;">👤</div>
-          <div style="font-weight:800; font-size:22px;">${u.name}</div>
-          <div style="background:#fee2e2; color:#dc2626; display:inline-block; padding:2px 16px; border-radius:40px; font-weight:600; font-size:13px;">🩸 ${u.diabetesType}</div>
-          <div style="color:#64748b; font-size:13px;">Since ${u.diagnosisDate}</div>
-        </div>
-
-        <div class="grid-2" style="margin:12px 0;">
-          <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">🩸 Blood Type</div><div style="font-weight:700;">${u.bloodGroup}</div></div>
-          <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">🏥 Hospital</div><div style="font-weight:700;">${u.hospital}</div></div>
-          <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">👨‍⚕️ Specialist</div><div style="font-weight:700;">${u.specialist}</div></div>
-          <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">📞 Specialist</div><div style="font-weight:700;">${u.specialistPhone}</div></div>
-        </div>
-
-        <div style="background:#f1f5f9; border-radius:12px; padding:12px; margin:12px 0;">
-          <div style="font-weight:700; font-size:13px;">📞 EMERGENCY CONTACT</div>
-          <div class="flex-between"><span>${u.emergencyName} (${u.relation})</span><span style="font-weight:600;">${u.emergencyPhone}</span></div>
-        </div>
-
-        <div style="background:#fef3c7; border-left:4px solid #f59e0b; padding:12px; border-radius:8px; margin:12px 0;">
-          <div style="font-size:13px; color:#92400e;"><strong>⚠️ LATEST READINGS (24h)</strong></div>
-          ${latest.map(r => `
-            <div class="flex-between" style="font-size:13px; padding:4px 0; border-bottom:1px solid #fde68a;">
-              <span>${r.date} ${r.meal} ${r.time}</span>
-              <span style="font-weight:700; color:${getStatusColor(r.value, r.time)};">${r.value} mg/dL</span>
-            </div>
-          `).join('')}
-          ${latest.length === 0 ? '<div style="color:#92400e;">No recent readings</div>' : ''}
-        </div>
-
-        <div class="flex-row" style="gap:8px; margin-top:8px;">
-          <button class="btn btn-danger" style="flex:1;" onclick="alert('📞 Calling emergency contact: ' + '${u.emergencyPhone}')">📞 Call</button>
-          <button class="btn btn-primary" style="flex:1;" onclick="alert('✅ Emergency card shared')">📤 Share</button>
-        </div>
-        <div style="text-align:center; margin-top:10px; color:#94a3b8; font-size:11px;">Scan QR for full medical record</div>
-      </div>
-    `;
-  }
-
-  function renderDashboard() {
-    const avg = getDailyAverage(state.today);
-    const readingsToday = getReadingsForDate(state.today);
-    const count = readingsToday.length;
-
-    return `
-      <div class="flex-between">
-        <div><div style="color:#64748b;">👋 Good morning,</div><div style="font-weight:800; font-size:22px;">${state.user.name}</div></div>
-        <div style="font-size:20px; cursor:pointer;" onclick="goTo('emergency')">🚨</div>
-      </div>
-      <div style="color:#0891b2; font-weight:500; margin-bottom:16px;">${state.today} · Wednesday</div>
-
-      <div class="grid-2" style="margin-bottom:12px;">
-        <div class="card" style="padding:12px; text-align:center;"><div style="font-size:28px; font-weight:800;">${avg || '—'}</div><div style="color:#64748b; font-size:12px;">Avg Glucose</div></div>
-        <div class="card" style="padding:12px; text-align:center;"><div style="font-size:28px; font-weight:800;">7.2%</div><div style="color:#64748b; font-size:12px;">Est. HbA1c</div></div>
-      </div>
-
-      <div class="card">
-        <div style="font-weight:700;">📊 Today's Readings</div>
-        ${['breakfast','lunch','dinner'].map(meal => {
-          const before = getReading(meal, 'before', state.today);
-          const after = getReading(meal, 'after', state.today);
-          return `
-            <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:14px;">
-              <span>${meal === 'breakfast' ? '🍳' : meal === 'lunch' ? '🥗' : '🍽️'} ${meal}</span>
-              <span><span style="color:${getStatusColor(before,'before')};">${before || '—'}</span> → <span style="color:${getStatusColor(after,'after')};">${after || '—'}</span></span>
-            </div>
-          `
-        }).join('')}
-        <div style="margin-top:8px; font-weight:600; color:#0891b2;">${count}/6 readings logged</div>
-      </div>
-
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn btn-primary" style="flex:1;" onclick="goTo('tracking')">📝 Log Glucose</button>
-        <button class="btn btn-outline" style="flex:1;" onclick="goTo('hba1c')">📈 HbA1c</button>
-        <button class="btn btn-outline" style="flex:1;" onclick="goTo('medications')">💊 Meds</button>
-      </div>
-      <div style="display:flex; gap:8px; margin-top:8px;">
-        <button class="btn btn-outline" style="flex:1;" onclick="goTo('profile')">👤 Profile</button>
-        <button class="btn btn-outline" style="flex:1;" onclick="goTo('reports')">📄 Reports</button>
-      </div>
-
-      <div style="margin-top:12px; background:#fef3c7; border-radius:12px; padding:12px; font-size:13px; color:#92400e;">
-        ⚠️ <strong>Fasting Mode:</strong> ${state.fastingMode ? 'Active (የጾም ጊዜ) — adjust insulin' : 'Inactive'}
-        <span style="display:inline-block; margin-left:8px; cursor:pointer; font-weight:600; color:#0891b2;" onclick="state.fastingMode=!state.fastingMode; render();">Toggle</span>
-      </div>
-    `;
-  }
-
-  function renderTracking() {
-    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    const dates = ['10','11','12','13','14','15','16'];
-    const todayIdx = 5; // Sat
-
-    return `
-      <div class="flex-between"><span style="font-weight:700; font-size:18px;">📅 Weekly Log</span><span style="color:#0891b2;">June 10-16, 2026</span></div>
-      <div class="flex-row" style="margin:12px 0; gap:4px;">
-        ${days.map((d,i) => `
-          <div class="pill-day ${i===todayIdx?'active':''}" onclick="alert('View ${d}')">
-            <div style="font-weight:600; font-size:12px;">${d}</div>
-            <div style="font-size:10px; color:#94a3b8;">${dates[i]}</div>
-            <div class="status-dot ${i===todayIdx?'dot-yellow':'dot-green'}" style="margin-top:4px;"></div>
-          </div>
-        `).join('')}
-      </div>
-
-      <div style="font-weight:700; font-size:16px;">📅 ${state.today} · Wednesday</div>
-
-      ${['breakfast','lunch','dinner'].map(meal => {
-        const before = getReading(meal, 'before', state.today);
-        const after = getReading(meal, 'after', state.today);
-        const icon = meal === 'breakfast' ? '🍳' : meal === 'lunch' ? '🥗' : '🍽️';
+    // =====================================================
+    //  ONBOARDING
+    // =====================================================
+    function renderOnboarding() {
         return `
-          <div class="card" style="margin-top:12px;">
-            <div style="font-weight:700; font-size:16px; margin-bottom:8px;">${icon} ${meal.toUpperCase()}</div>
-            <div class="flex-row">
-              <div style="flex:1; background:#f8fafc; padding:8px 12px; border-radius:12px;">
-                <div style="font-size:11px; color:#64748b;">Before</div>
-                <div style="font-weight:700; font-size:20px; color:${getStatusColor(before,'before')};">${before || '—'} <span style="font-size:12px; font-weight:400; color:#94a3b8;">mg/dL</span></div>
-              </div>
-              <div style="flex:1; background:#f8fafc; padding:8px 12px; border-radius:12px;">
-                <div style="font-size:11px; color:#64748b;">2h After</div>
-                <div style="font-weight:700; font-size:20px; color:${getStatusColor(after,'after')};">${after || '—'} <span style="font-size:12px; font-weight:400; color:#94a3b8;">mg/dL</span></div>
-              </div>
+            <div style="text-align:center; padding:12px 0 8px;">
+                <div style="font-size:56px; margin-bottom:4px;">🏥</div>
+                <div style="font-size:26px; font-weight:800; background:linear-gradient(135deg,#0891b2,#0d9488); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${_('app_name')}</div>
+                <div style="color:#475569; font-weight:500; font-size:14px;">${_('choose_lang')}</div>
             </div>
-          </div>
-        `
-      }).join('')}
 
-      <div class="card" style="background:linear-gradient(135deg,#0891b2,#0d9488); color:white;">
-        <div style="font-size:13px; opacity:0.9;">Daily Average Result (DAR)</div>
-        <div style="font-size:32px; font-weight:800;">${getDailyAverage(state.today) || '—'} mg/dL</div>
-        <div style="font-size:13px; opacity:0.8;">${getDailyAverage(state.today) ? (getDailyAverage(state.today) <=130 ? '✨ Excellent Control' : '👍 Good Control') : 'Log more readings'}</div>
-      </div>
+            <div style="font-weight:700; font-size:20px; margin-top:8px;">${_('choose_lang')}</div>
+            <div style="color:#64748b; margin-bottom:14px;">${_('choose_lang_sub')}</div>
 
-      <button class="btn btn-outline mt-2" onclick="goTo('dashboard')">← Back to Dashboard</button>
-    `;
-  }
+            <div class="lang-card selected" onclick="selectLanguage('en')">
+                <span style="font-size:28px;">🇬🇧</span>
+                <div><div style="font-weight:700;">${_('english')}</div><div style="color:#64748b;">English</div></div>
+                <span class="check">✓</span>
+            </div>
+            <div class="lang-card mt-1" onclick="selectLanguage('am')">
+                <span style="font-size:28px;">🇪🇹</span>
+                <div><div style="font-weight:700;">${_('amharic')}</div><div style="color:#64748b; font-size:18px; font-family:'Noto Sans Ethiopic',sans-serif;">አማርኛ</div></div>
+                <span class="check">✓</span>
+            </div>
 
-  function renderHbA1c() {
-    return `
-      <div style="font-weight:700; font-size:22px;">📊 HbA1c Estimator</div>
-      <div style="color:#64748b; margin-bottom:12px;">Based on 12-week average · ${state.today}</div>
+            <button class="btn btn-primary mt-2" onclick="selectLanguageAndContinue()">${_('continue')}</button>
+            <div style="font-size:12px; color:#94a3b8; text-align:center; margin-top:10px;">By continuing you agree to Terms & Privacy</div>
+        `;
+    }
 
-      <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white;">
-        <div style="font-size:14px; opacity:0.9;">Estimated HbA1c</div>
-        <div style="font-size:56px; font-weight:800;">7.2%</div>
-        <div style="font-size:14px; opacity:0.8;">55 mmol/mol</div>
-        <div style="background:rgba(255,255,255,0.2); display:inline-block; padding:4px 14px; border-radius:40px; font-size:12px; font-weight:600;">⚠️ Above Target (<7.0%)</div>
-      </div>
+    window.selectLanguage = function(lang) {
+        document.querySelectorAll('.lang-card').forEach(el => el.classList.remove('selected'));
+        // find the one with the flag
+        document.querySelectorAll('.lang-card').forEach(el => {
+            if (el.querySelector(`[style*="${lang === 'en' ? '🇬🇧' : '🇪🇹'}"]`)) {
+                el.classList.add('selected');
+            }
+        });
+        state.lang = lang;
+        // update header toggle
+        const icon = document.getElementById('langIcon');
+        const label = document.getElementById('langLabel');
+        if (lang === 'am') {
+            icon.textContent = '🇪🇹';
+            label.textContent = 'አማ';
+            document.getElementById('langToggle').classList.add('active');
+        } else {
+            icon.textContent = '🇬🇧';
+            label.textContent = 'EN';
+            document.getElementById('langToggle').classList.remove('active');
+        }
+    };
 
-      <div class="card">
-        <div style="font-weight:700;">📈 12-Week Trend</div>
-        <div style="display:flex; gap:4px; height:70px; align-items:flex-end; margin:12px 0;">
-          ${[40,45,50,35,42,52,55,44,48,58,53,60].map(h => `
-            <div style="flex:1; background:${h>55?'#ef4444':h>48?'#f59e0b':'#10b981'}; height:${h}px; border-radius:4px;"></div>
-          `).join('')}
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:9px; color:#94a3b8;">W1 W2 W3 W4 W5 W6 W7 W8 W9 W10 W11 W12</div>
-      </div>
+    window.selectLanguageAndContinue = function() {
+        state.screen = 'login';
+        render();
+    };
 
-      <div class="card">
-        <div style="font-weight:700; margin-bottom:8px;">📋 Reference Range (ADA)</div>
-        <div style="font-size:13px;">
-          <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span><span class="status-dot dot-green"></span> Normal</span><span>< 5.7%</span><span>< 117 mg/dL</span></div>
-          <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span><span class="status-dot dot-yellow"></span> Pre-diabetes</span><span>5.7–6.4%</span><span>117–137</span></div>
-          <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span><span class="status-dot" style="background:#f59e0b;"></span> Diabetes (Managed)</span><span>6.5–7.9%</span><span>140–180</span></div>
-          <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span><span class="status-dot dot-red"></span> High Risk</span><span>8.0–9.9%</span><span>183–240</span></div>
-          <div class="flex-between" style="padding:6px 0;"><span><span class="status-dot" style="background:#991b1b;"></span> Dangerous</span><span>≥10.0%</span><span>≥240</span></div>
-        </div>
-      </div>
+    // =====================================================
+    //  LOGIN
+    // =====================================================
+    function renderLogin() {
+        return `
+            <div style="font-weight:700; font-size:22px;">${_('welcome_back')}</div>
+            <div style="color:#64748b; margin-bottom:16px;">${_('sign_in')} to access your diabetes data</div>
 
-      <button class="btn btn-primary" onclick="alert('📄 Full report generated (PDF)')">📄 Generate Full Report</button>
-      <button class="btn btn-outline mt-2" onclick="goTo('dashboard')">← Back</button>
-    `;
-  }
+            <div class="flex-row" style="margin-bottom:16px;">
+                <button class="auth-tab active" onclick="switchAuth('login')">${_('sign_in')}</button>
+                <button class="auth-tab" onclick="switchAuth('signup')">${_('create_account')}</button>
+            </div>
 
-  function renderMedications() {
-    const meds = state.medications;
-    return `
-      <div class="flex-between"><span style="font-weight:700; font-size:22px;">💊 Medications</span><span style="font-size:28px; font-weight:300; color:#0891b2; cursor:pointer;" onclick="alert('Add new medication')">+</span></div>
+            <div class="form-group">
+                <label style="font-weight:600; font-size:14px; color:#475569;">📧 ${_('email_phone')}</label>
+                <input class="glucose-input" type="text" placeholder="Enter email or phone" value="alemu@example.com" />
+            </div>
+            <div class="form-group mt-1">
+                <label style="font-weight:600; font-size:14px; color:#475569;">🔒 ${_('password')}</label>
+                <input class="glucose-input" type="password" placeholder="Enter password" value="••••••••" />
+            </div>
 
-      <div class="flex-row" style="margin:12px 0;">
-        <div class="card" style="flex:1; text-align:center; padding:8px;"><span style="font-weight:800;">${meds.length}</span><br><span style="font-size:11px; color:#64748b;">Active</span></div>
-        <div class="card" style="flex:1; text-align:center; padding:8px;"><span style="font-weight:800;">${meds.filter(m=>m.reminder).length}</span><br><span style="font-size:11px; color:#64748b;">Reminders</span></div>
-      </div>
+            <button class="btn btn-primary mt-2" onclick="handleLogin()">🔑 ${_('sign_in')}</button>
+            <div style="text-align:right; margin-top:6px; color:#0891b2; font-weight:600; font-size:14px; cursor:pointer;" onclick="showToast('📧 Password reset link sent to your email')">${_('forgot_password')}</div>
+        `;
+    }
 
-      ${meds.map(m => `
-        <div class="card" style="border-left:4px solid ${m.type.includes('Insulin')?'#0891b2':'#8b5cf6'};">
-          <div class="flex-between">
-            <span style="font-weight:700;">${m.name}</span>
-            <span style="font-size:12px; color:#64748b;">${m.type}</span>
-          </div>
-          <div class="grid-2" style="margin:8px 0; font-size:14px;">
-            <div><span style="color:#64748b;">Morning</span> ${m.morning||'—'} ${m.unit}</div>
-            <div><span style="color:#64748b;">Afternoon</span> ${m.afternoon||'—'} ${m.unit}</div>
-            <div><span style="color:#64748b;">Night</span> ${m.night||'—'} ${m.unit}</div>
-            <div><span style="color:#64748b;">Total</span> ${(m.morning||0)+(m.afternoon||0)+(m.night||0)} ${m.unit}</div>
-          </div>
-          <div class="flex-between">
-            <span style="font-size:13px; color:#64748b;">🔔 Reminder</span>
-            <div class="toggle ${m.reminder?'active':''}" onclick="this.classList.toggle('active')"><div class="dot"></div></div>
-          </div>
-        </div>
-      `).join('')}
+    window.switchAuth = function(mode) {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        if (mode === 'login') {
+            document.querySelector('.auth-tab:first-child').classList.add('active');
+            state.screen = 'login';
+        } else {
+            document.querySelector('.auth-tab:last-child').classList.add('active');
+            state.screen = 'signup';
+        }
+        render();
+    };
 
-      <div class="card" style="background:#fef3c7; border:2px solid #f59e0b;">
-        <div style="font-weight:700;">🕊️ Fasting Season Mode</div>
-        <div style="font-size:13px; color:#92400e;">${state.fastingMode ? '✅ Active: Adjust medications for የጾም ጊዜ' : '⏸️ Inactive'}</div>
-        <button class="btn btn-outline mt-2" style="background:white;" onclick="state.fastingMode=!state.fastingMode; render();">${state.fastingMode ? 'Disable' : 'Enable'} Fasting Mode</button>
-      </div>
+    window.handleLogin = function() {
+        state.isLoggedIn = true;
+        state.screen = 'dashboard';
+        showToast(_('toast_login_success'));
+        render();
+    };
 
-      <button class="btn btn-outline mt-2" onclick="goTo('dashboard')">← Back</button>
-    `;
-  }
+    // =====================================================
+    //  SIGNUP
+    // =====================================================
+    function renderSignup() {
+        return `
+            <div style="font-weight:700; font-size:22px;">📝 ${_('create_account')}</div>
+            <div style="color:#64748b; margin-bottom:14px;">Complete your profile to get started</div>
 
-  function renderReports() {
-    return `
-      <div class="flex-between"><span style="font-weight:700; font-size:22px;">📄 Reports</span><span style="background:#f0fdfa; color:#0891b2; padding:4px 12px; border-radius:40px; font-size:12px; font-weight:600;">12 weeks</span></div>
+            <div class="flex-row" style="margin-bottom:14px;">
+                <button class="auth-tab" onclick="switchAuth('login')">${_('sign_in')}</button>
+                <button class="auth-tab active" onclick="switchAuth('signup')">${_('create_account')}</button>
+            </div>
 
-      <div class="card" style="background:linear-gradient(135deg,#0891b2,#0d9488); color:white;">
-        <div style="font-weight:700;">✨ Generate New Report</div>
-        <div style="font-size:13px; opacity:0.9;">Create comprehensive report for your doctor</div>
-        <div class="flex-row" style="margin-top:12px;">
-          <div style="flex:1; background:rgba(255,255,255,0.15); padding:10px; border-radius:12px; text-align:center; cursor:pointer;" onclick="alert('Quick summary generated')">📊 Quick</div>
-          <div style="flex:1; background:rgba(255,255,255,0.15); padding:10px; border-radius:12px; text-align:center; cursor:pointer;" onclick="alert('Full report generated')">📋 Full</div>
-        </div>
-      </div>
+            <div class="form-group">
+                <label style="font-weight:600; font-size:13px; color:#475569;">👤 ${_('full_name')}</label>
+                <input class="glucose-input" type="text" placeholder="Enter your full name" value="Alemu Tadesse" />
+            </div>
+            <div class="form-group mt-1">
+                <label style="font-weight:600; font-size:13px; color:#475569;">📧 ${_('email_phone')}</label>
+                <input class="glucose-input" type="text" placeholder="Enter email or phone" value="alemu@example.com" />
+            </div>
+            <div class="form-group mt-1">
+                <label style="font-weight:600; font-size:13px; color:#475569;">📱 ${_('phone_number')}</label>
+                <input class="glucose-input" type="text" placeholder="+251-XXX-XXX-XXX" value="+251-911-234567" />
+            </div>
+            <div class="form-group mt-1">
+                <label style="font-weight:600; font-size:13px; color:#475569;">🔒 ${_('password')}</label>
+                <input class="glucose-input" type="password" placeholder="Create a password" value="••••••••" />
+            </div>
 
-      <div class="card">
-        <div class="flex-between"><span style="font-weight:700;">📊 Monthly Summary</span><span style="color:#94a3b8; font-size:12px;">June 2026</span></div>
-        <div style="display:flex; gap:4px; height:40px; align-items:flex-end; margin:8px 0;">
-          ${[30,35,40,28,32,38,25].map(h => `<div style="flex:1; background:#10b981; height:${h}px; border-radius:4px;"></div>`).join('')}
-        </div>
-        <div class="flex-row" style="gap:4px;">
-          <button class="btn btn-primary" style="flex:1; padding:8px;" onclick="alert('View report')">👁️ View</button>
-          <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="alert('PDF downloaded')">📥 PDF</button>
-          <button class="btn btn-outline" style="flex:1; padding:8px;" onclick="alert('Shared via email')">📤 Share</button>
-        </div>
-      </div>
+            <div class="grid-2 mt-1">
+                <div class="form-group">
+                    <label style="font-weight:600; font-size:13px; color:#475569;">🩸 ${_('diabetes_type')}</label>
+                    <select class="glucose-input" style="padding:10px 12px;">
+                        <option value="type1">${_('type1')}</option>
+                        <option value="type2" selected>${_('type2')}</option>
+                        <option value="gestational">${_('gestational')}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="font-weight:600; font-size:13px; color:#475569;">📅 ${_('diagnosis_date')}</label>
+                    <input class="glucose-input" type="date" value="2018-01-15" />
+                </div>
+            </div>
 
-      <div class="card" style="border:2px solid #fee2e2;">
-        <div style="color:#dc2626; font-weight:700;">🚨 Emergency Medical ID</div>
-        <div style="font-size:14px; color:#475569;">${state.user.name} · ${state.user.diabetesType}</div>
-        <div style="font-size:13px; color:#64748b;">📞 ${state.user.emergencyPhone}</div>
-        <button class="btn btn-danger mt-2" onclick="goTo('emergency')">🆘 View Card</button>
-      </div>
+            <div class="form-group mt-1">
+                <label style="font-weight:600; font-size:13px; color:#475569;">🩸 ${_('blood_group')}</label>
+                <select class="glucose-input" style="padding:10px 12px;">
+                    <option value="A+">A+</option><option value="A-">A-</option>
+                    <option value="B+">B+</option><option value="B-">B-</option>
+                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                    <option value="O+" selected>O+</option><option value="O-">O-</option>
+                </select>
+            </div>
 
-      <button class="btn btn-outline mt-2" onclick="goTo('dashboard')">← Back</button>
-    `;
-  }
+            <div class="form-group mt-1">
+                <label style="font-weight:600; font-size:13px; color:#475569;">🔬 ${_('testing_method')}</label>
+                <select class="glucose-input" style="padding:10px 12px;">
+                    <option value="glucose_meter">${_('glucose_meter')}</option>
+                    <option value="cgm">${_('cgm')}</option>
+                    <option value="lab">${_('lab')}</option>
+                    <option value="multiple">${_('multiple')}</option>
+                </select>
+            </div>
 
-  // ------------------------------------------------
-  //  NAVIGATION & HELPERS
-  // ------------------------------------------------
-  window.goTo = function(screen) {
-    state.screen = screen;
+            <div class="form-group mt-1">
+                <label style="font-weight:600; font-size:13px; color:#475569;">⏰ ${_('testing_frequency')}</label>
+                <select class="glucose-input" style="padding:10px 12px;">
+                    <option value="frequent">${_('frequent')}</option>
+                    <option value="moderate" selected>${_('moderate')}</option>
+                    <option value="basic">${_('basic')}</option>
+                    <option value="custom">${_('custom_freq')}</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary mt-2" onclick="handleSignup()">${_('create_btn')}</button>
+        `;
+    }
+
+    window.handleSignup = function() {
+        state.isLoggedIn = true;
+        state.screen = 'dashboard';
+        showToast(_('toast_account_created'));
+        render();
+    };
+
+    // =====================================================
+    //  DASHBOARD
+    // =====================================================
+    function renderDashboard() {
+        const avg = getDailyAverage(state.today);
+        const readingsToday = getReadingsForDate(state.today);
+        const count = readingsToday.length;
+        const isAm = state.lang === 'am';
+
+        return `
+            <div class="flex-between">
+                <div><div style="color:#64748b; font-size:14px;">👋 ${_('good_morning')},</div>
+                <div style="font-weight:800; font-size:22px;">${state.user.name}</div></div>
+                <button class="btn btn-danger btn-sm" style="width:auto; padding:8px 14px; border-radius:40px;" onclick="navigateTo('emergency')">🚨</button>
+            </div>
+            <div style="color:#0891b2; font-weight:500; margin-bottom:14px; font-size:14px;">${state.today} · Wednesday</div>
+
+            <div class="grid-2">
+                <div class="card" style="padding:14px; text-align:center;">
+                    <div style="font-size:30px; font-weight:800;">${avg || '—'}</div>
+                    <div style="color:#64748b; font-size:12px;">${_('avg_glucose')}</div>
+                </div>
+                <div class="card" style="padding:14px; text-align:center;">
+                    <div style="font-size:30px; font-weight:800;">7.2%</div>
+                    <div style="color:#64748b; font-size:12px;">${_('est_hba1c')}</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="font-weight:700; margin-bottom:10px;">${_('today_readings')}</div>
+                ${['breakfast','lunch','dinner'].map(meal => {
+                    const before = getReading(meal, 'before', state.today);
+                    const after = getReading(meal, 'after', state.today);
+                    const icon = meal === 'breakfast' ? '🍳' : meal === 'lunch' ? '🥗' : '🍽️';
+                    const label = _(meal);
+                    return `
+                        <div class="reading-row">
+                            <span style="width:44px;">${icon}</span>
+                            <span style="flex:1; font-weight:500;">${label}</span>
+                            <span style="font-size:13px; color:${getStatusColor(before,'before')};">${before || '—'}</span>
+                            <span style="color:#94a3b8; font-size:12px;">→</span>
+                            <span style="font-size:13px; color:${getStatusColor(after,'after')};">${after || '—'}</span>
+                            <span class="status-dot" style="background:${getStatusColor(after || before, 'before')};"></span>
+                        </div>
+                    `
+                }).join('')}
+                <div style="margin-top:8px; font-weight:600; color:#0891b2; font-size:14px;">${count}/6 ${_('readings_logged')}</div>
+            </div>
+
+            <div class="grid-2" style="margin-top:4px;">
+                <button class="btn btn-primary btn-sm" style="padding:10px;" onclick="navigateTo('tracking')">📝 ${_('log_glucose')}</button>
+                <button class="btn btn-outline btn-sm" style="padding:10px;" onclick="navigateTo('hba1c')">📈 ${_('hba1c_btn')}</button>
+                <button class="btn btn-outline btn-sm" style="padding:10px;" onclick="navigateTo('medications')">💊 ${_('meds_btn')}</button>
+                <button class="btn btn-outline btn-sm" style="padding:10px;" onclick="navigateTo('profile')">👤 ${_('profile_btn')}</button>
+            </div>
+
+            <div class="card" style="background:#fef3c7; border-left:4px solid #f59e0b; margin-top:6px;">
+                <div class="flex-between">
+                    <span style="font-weight:600; font-size:14px; color:#92400e;">${isAm ? '🕊️ የጾም ጊዜ' : '🕊️ Fasting Mode'}</span>
+                    <span style="font-size:13px; color:#92400e;">${state.user.fastingMode ? '✅ ' + _('fasting_active') : '⏸️ ' + _('fasting_inactive')}</span>
+                </div>
+                <button class="btn btn-sm btn-secondary" style="width:auto; padding:6px 16px; margin-top:6px; font-size:13px;" onclick="toggleFastingMode()">
+                    ${state.user.fastingMode ? _('fasting_disable') : _('fasting_enable')}
+                </button>
+            </div>
+        `;
+    }
+
+    window.toggleFastingMode = function() {
+        state.user.fastingMode = !state.user.fastingMode;
+        showToast(state.user.fastingMode ? '🕊️ Fasting Mode activated' : '⏸️ Fasting Mode deactivated');
+        render();
+    };
+
+    // =====================================================
+    //  TRACKING
+    // =====================================================
+    function renderTracking() {
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const dates = ['10', '11', '12', '13', '14', '15', '16'];
+        const todayIdx = 5;
+
+        return `
+            <div class="flex-between">
+                <span style="font-weight:700; font-size:18px;">📅 ${_('weekly_log')}</span>
+                <span style="color:#0891b2; font-size:13px;">June 10-16, 2026</span>
+            </div>
+            <div class="flex-row" style="margin:10px 0; gap:4px;">
+                ${days.map((d, i) => `
+                    <div class="pill-day ${i === todayIdx ? 'active' : ''}" onclick="showToast('Viewing ${d}')">
+                        <div class="day-label">${d}</div>
+                        <div class="day-num">${dates[i]}</div>
+                        <div class="status-dot ${i === todayIdx ? 'dot-yellow' : 'dot-green'}" style="margin-top:4px;"></div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div style="font-weight:700; font-size:16px;">📅 ${state.today} · Wednesday</div>
+
+            ${['breakfast', 'lunch', 'dinner'].map(meal => {
+                const before = getReading(meal, 'before', state.today);
+                const after = getReading(meal, 'after', state.today);
+                const icon = meal === 'breakfast' ? '🍳' : meal === 'lunch' ? '🥗' : '🍽️';
+                const label = _(meal);
+                return `
+                    <div class="card" style="margin-top:10px;">
+                        <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${icon} ${label}</div>
+                        <div class="flex-row" style="gap:8px;">
+                            <div style="flex:1; background:#f8fafc; padding:10px 12px; border-radius:12px; cursor:pointer;" onclick="editReading('${meal}','before')">
+                                <div style="font-size:11px; color:#64748b;">${_('before_meal')}</div>
+                                <div style="font-weight:700; font-size:18px; color:${getStatusColor(before, 'before')};">${before || '—'} <span style="font-size:11px; font-weight:400; color:#94a3b8;">mg/dL</span></div>
+                                <div style="font-size:10px; color:${getStatusColor(before, 'before')};">${before ? getStatusLabel(before, 'before') : 'Tap to add'}</div>
+                            </div>
+                            <div style="flex:1; background:#f8fafc; padding:10px 12px; border-radius:12px; cursor:pointer;" onclick="editReading('${meal}','after')">
+                                <div style="font-size:11px; color:#64748b;">${_('after_meal')}</div>
+                                <div style="font-weight:700; font-size:18px; color:${getStatusColor(after, 'after')};">${after || '—'} <span style="font-size:11px; font-weight:400; color:#94a3b8;">mg/dL</span></div>
+                                <div style="font-size:10px; color:${getStatusColor(after, 'after')};">${after ? getStatusLabel(after, 'after') : 'Tap to add'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }).join('')}
+
+            <div class="card" style="background:linear-gradient(135deg,#0891b2,#0d9488); color:white;">
+                <div style="font-size:13px; opacity:0.9;">${_('daily_average')}</div>
+                <div style="font-size:32px; font-weight:800;">${getDailyAverage(state.today) || '—'} mg/dL</div>
+                <div style="font-size:13px; opacity:0.8;">
+                    ${getDailyAverage(state.today) ? 
+                        (getDailyAverage(state.today) <= 130 ? _('excellent') : 
+                         getDailyAverage(state.today) <= 180 ? _('good') : _('needs_attention')) 
+                        : 'Log more readings'}
+                </div>
+            </div>
+
+            <button class="btn btn-secondary mt-1" onclick="navigateTo('dashboard')">← ${_('back')}</button>
+        `;
+    }
+
+    window.editReading = function(meal, time) {
+        const current = getReading(meal, time, state.today);
+        const val = prompt(`Enter ${meal} ${time} glucose (mg/dL):`, current || '');
+        if (val !== null && !isNaN(val) && val >= 20 && val <= 600) {
+            // update or add
+            const existing = state.readings.find(r => r.date === state.today && r.meal === meal && r.time === time);
+            if (existing) {
+                existing.value = parseInt(val);
+            } else {
+                state.readings.push({ date: state.today, meal, time, value: parseInt(val) });
+            }
+            showToast(_('toast_reading_saved'));
+            render();
+        } else if (val !== null) {
+            showToast('⚠️ Please enter a value between 20-600 mg/dL');
+        }
+    };
+
+    // =====================================================
+    //  EMERGENCY
+    // =====================================================
+    function renderEmergency() {
+        const u = state.user;
+        const sorted = [...state.readings].sort((a, b) => b.date.localeCompare(a.date) || (a.time === 'after' ? 1 : -1));
+        const latest = sorted.slice(0, 4);
+
+        return `
+            <div class="emergency-banner">🚨 ${_('emergency_title')}</div>
+            <div class="card" style="border-radius:0 0 18px 18px; margin-top:0;">
+                <div style="text-align:center;">
+                    <div style="font-size:44px;">👤</div>
+                    <div style="font-weight:800; font-size:22px;">${u.name}</div>
+                    <div style="background:#fee2e2; color:#dc2626; display:inline-block; padding:2px 16px; border-radius:40px; font-weight:600; font-size:13px;">🩸 ${u.diabetesType}</div>
+                    <div style="color:#64748b; font-size:13px;">Since ${u.diagnosisDate}</div>
+                </div>
+
+                <div class="grid-2" style="margin:12px 0;">
+                    <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">🩸 ${_('blood_type')}</div><div style="font-weight:700;">${u.bloodGroup}</div></div>
+                    <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">🏥 ${_('hospital')}</div><div style="font-weight:700;">${u.hospital}</div></div>
+                    <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">👨‍⚕️ ${_('specialist')}</div><div style="font-weight:700;">${u.specialist}</div></div>
+                    <div style="background:#f8fafc; padding:12px; border-radius:12px;"><div style="color:#64748b; font-size:11px;">📞 ${_('specialist')}</div><div style="font-weight:700;">${u.specialistPhone}</div></div>
+                </div>
+
+                <div style="background:#f1f5f9; border-radius:12px; padding:12px; margin:12px 0;">
+                    <div style="font-weight:700; font-size:13px;">📞 ${_('emergency_contact')}</div>
+                    <div class="flex-between"><span>${u.emergencyName} (${u.relation})</span><span style="font-weight:600;">${u.emergencyPhone}</span></div>
+                </div>
+
+                <div style="background:#fef3c7; border-left:4px solid #f59e0b; padding:12px; border-radius:8px; margin:12px 0;">
+                    <div style="font-size:13px; color:#92400e; font-weight:700;">⚠️ ${_('latest_readings')}</div>
+                    ${latest.map(r => `
+                        <div class="flex-between" style="font-size:13px; padding:4px 0; border-bottom:1px solid #fde68a;">
+                            <span>${r.date} ${r.meal} ${r.time}</span>
+                            <span style="font-weight:700; color:${getStatusColor(r.value, r.time)};">${r.value} mg/dL</span>
+                        </div>
+                    `).join('')}
+                    ${latest.length === 0 ? '<div style="color:#92400e;">No recent readings</div>' : ''}
+                </div>
+
+                <div class="flex-row" style="gap:8px; margin-top:8px;">
+                    <button class="btn btn-danger" style="flex:1; padding:12px;" onclick="showToast(_('toast_emergency_called'))">📞 ${_('call')}</button>
+                    <button class="btn btn-primary" style="flex:1; padding:12px;" onclick="showToast(_('toast_emergency_shared'))">📤 ${_('share')}</button>
+                </div>
+                <div style="text-align:center; margin-top:8px; color:#94a3b8; font-size:11px;">Scan QR for full medical record</div>
+            </div>
+        `;
+    }
+
+    // =====================================================
+    //  MEDICATIONS
+    // =====================================================
+    function renderMedications() {
+        const meds = state.medications;
+        const isAm = state.lang === 'am';
+
+        return `
+            <div class="flex-between">
+                <span style="font-weight:700; font-size:20px;">💊 ${_('medications_title')}</span>
+                <button class="btn btn-primary btn-sm" style="width:auto; padding:6px 14px; border-radius:40px;" onclick="addMedication()">➕ ${_('add_med')}</button>
+            </div>
+
+            <div class="flex-row" style="margin:10px 0;">
+                <div class="card" style="flex:1; text-align:center; padding:10px;"><span style="font-weight:800;">${meds.length}</span><br><span style="font-size:11px; color:#64748b;">${_('active')}</span></div>
+                <div class="card" style="flex:1; text-align:center; padding:10px;"><span style="font-weight:800;">${meds.filter(m => m.reminder).length}</span><br><span style="font-size:11px; color:#64748b;">${_('reminders')}</span></div>
+            </div>
+
+            ${meds.map(m => `
+                <div class="card" style="border-left:4px solid ${m.type.includes('Insulin') ? '#0891b2' : '#8b5cf6'};">
+                    <div class="flex-between">
+                        <span style="font-weight:700;">${m.name}</span>
+                        <span style="font-size:11px; color:#64748b;">${m.type}</span>
+                    </div>
+                    <div class="grid-2" style="margin:8px 0; font-size:13px;">
+                        <div><span style="color:#64748b;">${_('morning')}</span> ${m.morning || '—'} ${m.unit}</div>
+                        <div><span style="color:#64748b;">${_('afternoon')}</span> ${m.afternoon || '—'} ${m.unit}</div>
+                        <div><span style="color:#64748b;">${_('night')}</span> ${m.night || '—'} ${m.unit}</div>
+                        <div><span style="color:#64748b;">${_('total')}</span> ${(m.morning || 0) + (m.afternoon || 0) + (m.night || 0)} ${m.unit}</div>
+                    </div>
+                    <div class="flex-between">
+                        <span style="font-size:13px; color:#64748b;">🔔 ${_('reminder_label')}</span>
+                        <div class="toggle ${m.reminder ? 'active' : ''}" onclick="this.classList.toggle('active'); showToast('Reminder toggled')"><div class="dot"></div></div>
+                    </div>
+                </div>
+            `).join('')}
+
+            <div class="card" style="background:#fef3c7; border:2px solid #f59e0b;">
+                <div style="font-weight:700;">🕊️ ${_('fasting_season')}</div>
+                <div style="font-size:13px; color:#92400e;">${state.user.fastingMode ? '✅ ' + _('fasting_active') : '⏸️ ' + _('fasting_inactive')}</div>
+                <button class="btn btn-sm btn-secondary" style="width:auto; padding:6px 16px; margin-top:6px; font-size:13px;" onclick="toggleFastingMode()">
+                    ${state.user.fastingMode ? _('fasting_disable') : _('fasting_enable')}
+                </button>
+            </div>
+        `;
+    }
+
+    window.addMedication = function() {
+        const name = prompt('Enter medication name:', 'New Med');
+        if (name) {
+            state.medications.push({
+                id: Date.now(),
+                name: name,
+                type: 'Custom',
+                morning: 0,
+                afternoon: 0,
+                night: 0,
+                unit: 'mg',
+                active: true,
+                reminder: true
+            });
+            showToast(_('toast_med_added'));
+            render();
+        }
+    };
+
+    // =====================================================
+    //  PROFILE
+    // =====================================================
+    function renderProfile() {
+        const u = state.user;
+        return `
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+                <div style="width:64px; height:64px; background:linear-gradient(135deg,#0891b2,#0d9488); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px;">👤</div>
+                <div>
+                    <div style="font-weight:800; font-size:20px;">${u.name}</div>
+                    <div style="color:#475569; font-size:14px;">${u.email}</div>
+                    <div style="background:#f0fdfa; color:#0891b2; padding:2px 12px; border-radius:40px; font-size:11px; font-weight:600; display:inline-block; margin-top:2px;">🩸 ${u.diabetesType} • Since 2018</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="flex-between"><span style="font-weight:700;">🏥 ${_('medical_info')}</span><span style="color:#0891b2; font-weight:600; cursor:pointer;" onclick="showToast('✏️ Edit mode opened')">${_('edit')}</span></div>
+                <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">🩸 ${_('diabetes_type')}</span><span style="font-weight:600;">${u.diabetesType}</span></div>
+                <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">📅 ${_('diagnosis_date')}</span><span style="font-weight:600;">${u.diagnosisDate}</span></div>
+                <div class="flex-between" style="padding:6px 0; border-bottom:1px solid #f1f5f9;"><span style="color:#64748b;">🩸 ${_('blood_group')}</span><span style="font-weight:600;">${u.bloodGroup}</span></div>
+                <div class="flex-between" style="padding:6px 0;"><span style="color:#64748b;">🏥 ${_('hospital')}</span><span style="font-weight:600;">${u.hospital}</span></div>
+            </div>
+
+            <div class="card">
+                <div class="flex-between"><span style="font-weight:700;">📞 ${_('emergency_contact_label')}</span><span style="color:#0891b2; font-weight:600; cursor:pointer;" onclick="showToast('✏️ Edit emergency contact')">${_('edit')}</span></div>
+                <div class="flex-between" style="padding:6px 0;"><span style="color:#64748b;">👤 ${u.emergencyName}</span><span style="font-weight:600;">${u.emergencyPhone}</span></div>
+                <div style="color:#64748b; font-size:13px;">${u.relation} • ${u.emergencyAddress}</div>
+            </div>
+
+            <div class="card">
+                <div style="font-weight:700;">⚙️ ${_('settings')}</div>
+                <div class="flex-between" style="padding:6px 0;"><span>🌐 ${_('language')}</span><span style="color:#0891b2; font-weight:500; cursor:pointer;" onclick="toggleLanguage()">${state.lang === 'en' ? 'English 🇬🇧' : 'አማርኛ 🇪🇹'}</span></div>
+                <div class="flex-between" style="padding:6px 0;"><span>🔔 ${_('notifications')}</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="dot"></div></div></div>
+                <div class="flex-between" style="padding:6px 0;"><span>☁️ ${_('cloud_sync')}</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="dot"></div></div></div>
+            </div>
+
+            <button class="btn btn-secondary mt-1" onclick="navigateTo('dashboard')">← ${_('back')}</button>
+        `;
+    }
+
+    // =====================================================
+    //  REPORTS
+    // =====================================================
+    function renderReports() {
+        return `
+            <div class="flex-between">
+                <span style="font-weight:700; font-size:20px;">📄 ${_('reports_title')}</span>
+                <span style="background:#f0fdfa; color:#0891b2; padding:4px 12px; border-radius:40px; font-size:11px; font-weight:600;">12 weeks</span>
+            </div>
+
+            <div class="card" style="background:linear-gradient(135deg,#0891b2,#0d9488); color:white;">
+                <div style="font-weight:700;">✨ ${_('generate_report')}</div>
+                <div style="font-size:13px; opacity:0.9;">Create comprehensive report for your doctor</div>
+                <div class="flex-row" style="margin-top:10px;">
+                    <div style="flex:1; background:rgba(255,255,255,0.15); padding:10px; border-radius:12px; text-align:center; cursor:pointer;" onclick="showToast(_('toast_report_generated'))">📊 ${_('quick_summary')}</div>
+                    <div style="flex:1; background:rgba(255,255,255,0.15); padding:10px; border-radius:12px; text-align:center; cursor:pointer;" onclick="showToast(_('toast_report_generated'))">📋 ${_('full_report')}</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="flex-between"><span style="font-weight:700;">📊 ${_('monthly_summary')}</span><span style="color:#94a3b8; font-size:12px;">June 2026</span></div>
+                <div style="display:flex; gap:4px; height:40px; align-items:flex-end; margin:8px 0;">
+                    ${[30, 35, 40, 28, 32, 38, 25].map(h => `<div style="flex:1; background:#10b981; height:${h}px; border-radius:4px;"></div>`).join('')}
+                </div>
+                <div class="flex-row" style="gap:4px;">
+                    <button class="btn btn-primary btn-sm" style="flex:1; padding:6px;" onclick="showToast('📊 Viewing report')">👁️ ${_('view')}</button>
+                    <button class="btn btn-outline btn-sm" style="flex:1; padding:6px;" onclick="showToast('📥 PDF downloaded')">📥 ${_('pdf')}</button>
+                    <button class="btn btn-outline btn-sm" style="flex:1; padding:6px;" onclick="showToast('📤 Shared')">📤 ${_('share_report')}</button>
+                </div>
+            </div>
+
+            <div class="card" style="border:2px solid #fee2e2;">
+                <div style="color:#dc2626; font-weight:700;">🚨 ${_('emergency_id_card')}</div>
+                <div style="font-size:14px; color:#475569;">${state.user.name} · ${state.user.diabetesType}</div>
+                <div style="font-size:13px; color:#64748b;">📞 ${state.user.emergencyPhone}</div>
+                <button class="btn btn-danger btn-sm mt-1" style="padding:8px;" onclick="navigateTo('emergency')">🆘 ${_('view_card')}</button>
+            </div>
+        `;
+    }
+
+    // =====================================================
+    //  INIT
+    // =====================================================
     render();
-  };
 
-  window.selectLang = function(lang) {
-    state.lang = lang;
-    document.querySelectorAll('.lang-card').forEach(el => el.classList.remove('selected'));
-    // just visual for demo
-    alert(`Language set to ${lang === 'en' ? 'English' : 'Amharic (አማርኛ)'}`);
-    // go to login
-    goTo('login');
-  };
-
-  // ------------------------------------------------
-  //  INIT
-  // ------------------------------------------------
-  render();
+    // make functions globally accessible for inline onclick
+    window.navigateTo = navigateTo;
+    window.toggleLanguage = toggleLanguage;
+    window.switchAuth = switchAuth;
+    window.handleLogin = handleLogin;
+    window.handleSignup = handleSignup;
+    window.selectLanguage = selectLanguage;
+    window.selectLanguageAndContinue = selectLanguageAndContinue;
+    window.toggleFastingMode = toggleFastingMode;
+    window.editReading = editReading;
+    window.addMedication = addMedication;
+    window.showToast = showToast;
 </script>
 
 </body>
